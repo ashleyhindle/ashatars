@@ -9,8 +9,8 @@ import { FAVICON_SVG } from "./favicon";
 
 export interface Env {}
 
-const CANONICAL_HOMEPAGE_URL = "https://avatars.fuel.build/";
-const HOMEPAGE_SOCIAL_TITLE = "Ashatars";
+const CANONICAL_HOMEPAGE_URL = "https://avatars.fuel.build/?v=2";
+const HOMEPAGE_SOCIAL_TITLE = "Fuel Avatars";
 const HOMEPAGE_SOCIAL_DESCRIPTION = "Deterministic SVG avatars for emails and UUIDs, generated at the edge.";
 const OG_KIT_IMAGE_URL = `https://ogkit.dev/img/I5SRd8yM.jpeg?url=${encodeURIComponent(CANONICAL_HOMEPAGE_URL)}`;
 
@@ -166,7 +166,7 @@ export function renderHomepage(origin = "https://example.test"): string {
     <meta name="twitter:title" content="${escapeAttribute(HOMEPAGE_SOCIAL_TITLE)}"/>
     <meta name="twitter:description" content="${escapeAttribute(HOMEPAGE_SOCIAL_DESCRIPTION)}"/>
     <meta name="twitter:image" content="${escapeAttribute(OG_KIT_IMAGE_URL)}"/>
-    <title>Line Avatars</title>
+    <title>Fuel Avatars</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
       :root {
@@ -542,7 +542,7 @@ export function renderHomepage(origin = "https://example.test"): string {
     <main>
       <section class="masthead" aria-labelledby="title">
         <div>
-          <h1 id="title">Line Avatars</h1>
+          <h1 id="title">Fuel Avatars</h1>
           <p class="current-seed"><span class="field-label">Seed</span> <code id="seed-value">${escapeText(seed)}</code></p>
         </div>
         <div class="controls">
@@ -736,7 +736,7 @@ function renderOgTemplate(): string {
     `</div>`,
     `<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:60px;">`,
     `<div style="width:670px;">`,
-    `<h1 style="margin:0 0 24px;font-size:108px;line-height:.92;font-weight:900;letter-spacing:0;color:#ffffff;">Ashatars</h1>`,
+    `<h1 style="margin:0 0 24px;font-size:108px;line-height:.92;font-weight:900;letter-spacing:0;color:#ffffff;">Fuel Avatars</h1>`,
     `<p style="margin:0 0 34px;color:#dbeafe;font-size:38px;line-height:1.16;font-weight:650;">Deterministic SVG avatars for emails and UUIDs, generated at the edge.</p>`,
     `<div style="display:inline-flex;max-width:660px;border:1px solid rgba(255,255,255,.22);border-radius:18px;background:rgba(8,12,20,.72);padding:18px 22px;color:#a7f3d0;font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace;font-size:25px;line-height:1.28;box-shadow:0 18px 50px rgba(0,0,0,.28);">/ashley@fuel.build.svg?type=dots&amp;vibe=stealth</div>`,
     `</div>`,
