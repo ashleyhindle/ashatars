@@ -9,7 +9,7 @@ import { FAVICON_SVG } from "./favicon";
 
 export interface Env {}
 
-const CANONICAL_HOMEPAGE_URL = "https://avatars.fuel.build/?v=2";
+const CANONICAL_HOMEPAGE_URL = "https://avatars.fuel.build/?v=3";
 const HOMEPAGE_SOCIAL_TITLE = "Fuel Avatars";
 const HOMEPAGE_SOCIAL_DESCRIPTION = "Deterministic SVG avatars for emails and UUIDs, generated at the edge.";
 const OG_KIT_IMAGE_URL = `https://ogkit.dev/img/I5SRd8yM.jpeg?url=${encodeURIComponent(CANONICAL_HOMEPAGE_URL)}`;
