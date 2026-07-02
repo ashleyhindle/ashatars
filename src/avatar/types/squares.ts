@@ -1,72 +1,33 @@
 import type { AvatarContext } from "../core";
 import type { AvatarArtwork, AvatarShape } from "../render";
-import type { PaletteRole } from "../vibes";
 
 export const SQUARES_TYPE = "squares";
 
-const SQUARE_COUNTS = [4, 5, 6, 7, 8, 9] as const;
-const FILL_ROLES = ["soft", "primary", "secondary", "accent"] as const satisfies readonly PaletteRole[];
-const STROKE_ROLES = ["contrast", "primary", "accent"] as const satisfies readonly PaletteRole[];
-
-interface SquareSpec {
-  readonly x: number;
-  readonly y: number;
-  readonly size: number;
-  readonly opacity: number;
-  readonly fillRole: PaletteRole;
-  readonly strokeRole: PaletteRole;
-  readonly strokeWidth: number;
-}
+const SQUARE_COUNTS = [1, 2, 3, 4] as const;
 
 export function generateSquares(ctx: AvatarContext): AvatarArtwork {
   const count = ctx.rng.pick(SQUARE_COUNTS);
-  const specs: SquareSpec[] = [];
+  const shapes: AvatarShape[] = [];
 
   for (let index = 0; index < count; index += 1) {
-    const size = ctx.rng.int(56, 238);
-    const max = ctx.size - size - 32;
-    const x = ctx.rng.int(32, Math.max(32, max));
-    const y = ctx.rng.int(32, Math.max(32, max));
+    const size = ctx.rng.int(41, 240);
+    const x = ctx.rng.int(40, Math.max(40, ctx.size - size - 40));
+    const y = ctx.rng.int(40, Math.max(40, ctx.size - size - 40));
 
-    specs.push({
-      x,
-      y,
-      size,
-      opacity: ctx.rng.float(0.28, 0.74),
-      fillRole: FILL_ROLES[(index + ctx.rng.int(0, FILL_ROLES.length - 1)) % FILL_ROLES.length]!,
-      strokeRole: STROKE_ROLES[(index + ctx.rng.int(0, STROKE_ROLES.length - 1)) % STROKE_ROLES.length]!,
-      strokeWidth: ctx.rng.int(4, 12),
+    shapes.push({
+      kind: "path",
+      d: `M${x},${y} h${size} v${size} h-${size} z`,
+      fill: "none",
+      stroke: { role: "primary" },
+      strokeWidth: ctx.rng.int(7, 14),
     });
   }
-
-  const ordered = [...specs].sort((a, b) => b.size - a.size);
-  const fills: AvatarShape[] = ordered.map((square) => ({
-    kind: "rect",
-    x: square.x,
-    y: square.y,
-    width: square.size,
-    height: square.size,
-    fill: { role: square.fillRole },
-    opacity: square.opacity,
-  }));
-  const outlines: AvatarShape[] = ordered.map((square) => ({
-    kind: "path",
-    d: `M${square.x},${square.y} h${square.size} v${square.size} h-${square.size} z`,
-    fill: "none",
-    stroke: { role: square.strokeRole },
-    strokeWidth: square.strokeWidth,
-    opacity: 0.82,
-  }));
 
   return {
     layers: [
       {
-        id: "squares-fill",
-        shapes: fills,
-      },
-      {
-        id: "squares-outline",
-        shapes: outlines,
+        id: "squares",
+        shapes,
       },
     ],
   };

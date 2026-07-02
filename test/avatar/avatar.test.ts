@@ -231,7 +231,7 @@ describe("dots avatar exemplar", () => {
     if (first.ok && second.ok) {
       expect(first.value.svg).toBe(second.value.svg);
       expect(hashHex(["snapshot", first.value.svg])).toBe(
-        "d8f6707ac5abbec2a6a9df6ccae9bcfa",
+        "6abffd6873bddaf9c4a8e3241fb52d32",
       );
     }
   });
@@ -273,7 +273,7 @@ function markColors(svg: string): string[] {
 }
 
 describe("circles avatar generator", () => {
-  test("returns deterministic structured bubble layers inside the viewBox", () => {
+  test("returns deterministic sparse circle outlines inside the viewBox", () => {
     const first = generateCircles(
       createAvatarContext({
         seed: "ashley@fuel.build",
@@ -290,15 +290,10 @@ describe("circles avatar generator", () => {
     );
 
     expect(first).toEqual(second);
-    expect(first.layers.map((layer) => layer.id)).toEqual([
-      "circles-soft",
-      "circles-rings",
-      "circles-accents",
-    ]);
+    expect(first.layers.map((layer) => layer.id)).toEqual(["circles"]);
 
     const shapes = first.layers.flatMap((layer) => layer.shapes);
-    expect(shapes.length).toBeGreaterThanOrEqual(14);
-    expect(shapes.length).toBeLessThanOrEqual(26);
+    expect([1, 3, 4]).toContain(shapes.length);
     expect(shapes.every((shape) => shape.kind === "circle")).toBe(true);
 
     for (const shape of shapes) {
@@ -322,7 +317,7 @@ describe("circles avatar generator", () => {
     const svg = renderAvatarSvg(ctx, VIBES.ocean, artwork);
 
     expect(svg).toContain('viewBox="0 0 512 512"');
-    expect(svg).toContain('id="circles-soft"');
+    expect(svg).toContain('id="circles"');
     expect(svg).toContain('fill="none"');
     expect(svg).toContain(VIBES.ocean.palette.primary);
     expect(JSON.stringify(artwork)).not.toContain(VIBES.ocean.palette.primary);

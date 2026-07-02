@@ -1,8 +1,10 @@
 import type { AvatarContext } from "../core";
 import type { AvatarArtwork, AvatarShape } from "../render";
-import type { PaletteRole } from "../vibes";
+import { clamp, fmt } from "./ref-geometry";
 
 export const DIAGONAL_GRID_TYPE = "diagonal_grid";
+
+const LINE_COUNTS = [2, 3, 4, 5] as const;
 
 type GridLine = {
   readonly x1: number;
@@ -11,84 +13,38 @@ type GridLine = {
   readonly y2: number;
 };
 
-const GRID_ROLES = ["primary", "secondary", "accent", "contrast"] as const satisfies readonly PaletteRole[];
-
 export function generateDiagonalGrid(ctx: AvatarContext): AvatarArtwork {
-  const angle = ctx.rng.float(24, 68) * (ctx.rng.next() < 0.5 ? -1 : 1);
-  const horizontalCount = ctx.rng.int(4, 6);
-  const verticalCount = ctx.rng.int(4, 6);
-  const margin = ctx.size * 0.18;
-  const jitter = ctx.size * 0.035;
-  const horizontalLines = makeAxisLines(ctx, "horizontal", horizontalCount, margin, jitter);
-  const verticalLines = makeAxisLines(ctx, "vertical", verticalCount, margin, jitter);
-  const hairlineWidth = ctx.rng.float(2.2, 4.8);
-  const emphasisEvery = ctx.rng.int(2, 3);
-  const rotated = [...horizontalLines, ...verticalLines].map((line) =>
-    rotateLine(line, angle, ctx.size / 2),
-  );
+  const count = ctx.rng.pick(LINE_COUNTS);
+  const angle = ctx.rng.int(20, 89);
+  const candidates: GridLine[] = [];
+
+  for (let index = 0; index < count; index += 1) {
+    const y = ctx.rng.int(0, ctx.size);
+    const x = ctx.rng.int(0, ctx.size);
+    candidates.push({ x1: 0, y1: y, x2: ctx.size, y2: y }, { x1: x, y1: 0, x2: x, y2: ctx.size });
+  }
+
+  const shapes = shuffle(ctx, candidates)
+    .slice(0, count)
+    .map((line): AvatarShape => {
+      const rotated = rotateLine(line, angle, ctx.size / 2);
+      return {
+        kind: "path",
+        d: `M${fmt(clamp(rotated.x1, 0, ctx.size))},${fmt(clamp(rotated.y1, 0, ctx.size))} L${fmt(clamp(rotated.x2, 0, ctx.size))},${fmt(clamp(rotated.y2, 0, ctx.size))}`,
+        fill: "none",
+        stroke: { role: "primary" },
+        strokeWidth: ctx.rng.int(10, 20),
+      };
+    });
 
   return {
     layers: [
       {
-        id: "diagonal_grid-soft",
-        opacity: 0.42,
-        shapes: rotated.map((line): AvatarShape => ({
-          kind: "path",
-          d: linePath(line),
-          fill: "none",
-          stroke: { role: "soft" },
-          strokeWidth: hairlineWidth + 7,
-          opacity: ctx.rng.float(0.22, 0.42),
-        })),
-      },
-      {
-        id: "diagonal_grid-lines",
-        shapes: rotated.map((line, index): AvatarShape => ({
-          kind: "path",
-          d: linePath(line),
-          fill: "none",
-          stroke: {
-            role: index % emphasisEvery === 0 ? "accent" : GRID_ROLES[index % GRID_ROLES.length]!,
-          },
-          strokeWidth: index % emphasisEvery === 0 ? hairlineWidth + 1.6 : hairlineWidth,
-          opacity: ctx.rng.float(0.6, 0.9),
-        })),
+        id: "diagonal_grid",
+        shapes,
       },
     ],
   };
-}
-
-function makeAxisLines(
-  ctx: AvatarContext,
-  axis: "horizontal" | "vertical",
-  count: number,
-  margin: number,
-  jitter: number,
-): GridLine[] {
-  const extent = ctx.size + margin * 2;
-  const spacing = extent / (count + 1);
-
-  return Array.from({ length: count }, (_, index) => {
-    const position = -margin + spacing * (index + 1) + ctx.rng.float(-jitter, jitter);
-
-    if (axis === "horizontal") {
-      const y = position;
-      return {
-        x1: -margin,
-        y1: y,
-        x2: ctx.size + margin,
-        y2: y + ctx.rng.float(-jitter, jitter) * 0.3,
-      };
-    }
-
-    const x = position;
-    return {
-      x1: x,
-      y1: -margin,
-      x2: x + ctx.rng.float(-jitter, jitter) * 0.3,
-      y2: ctx.size + margin,
-    };
-  });
 }
 
 function rotateLine(line: GridLine, angleDegrees: number, center: number): GridLine {
@@ -106,13 +62,7 @@ function rotateLine(line: GridLine, angleDegrees: number, center: number): GridL
   };
 }
 
-function rotatePoint(
-  x: number,
-  y: number,
-  center: number,
-  cos: number,
-  sin: number,
-): { readonly x: number; readonly y: number } {
+function rotatePoint(x: number, y: number, center: number, cos: number, sin: number) {
   const dx = x - center;
   const dy = y - center;
 
@@ -122,12 +72,11 @@ function rotatePoint(
   };
 }
 
-function linePath(line: GridLine): string {
-  return `M${formatPathNumber(line.x1)},${formatPathNumber(line.y1)} L${formatPathNumber(
-    line.x2,
-  )},${formatPathNumber(line.y2)}`;
-}
-
-function formatPathNumber(value: number): string {
-  return value.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+function shuffle<T>(ctx: AvatarContext, values: readonly T[]): T[] {
+  const shuffled = [...values];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = ctx.rng.int(0, index);
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex]!, shuffled[index]!];
+  }
+  return shuffled;
 }
