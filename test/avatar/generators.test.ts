@@ -111,6 +111,56 @@ describe("ref-inspired avatar generators", () => {
     }
   });
 
+  test("sunrise generator keeps one path layer with visible deterministic stroke-width spread", () => {
+    for (const seed of ["ashley@fuel.build", "7db79f08-6b58-434d-a58d-3309b9eb0975"]) {
+      const input = { seed, type: "sunrise", vibe: "stealth" };
+      const first = getAvatarGenerator("sunrise")!.generate(createAvatarContext(input));
+      const second = getAvatarGenerator("sunrise")!.generate(createAvatarContext(input));
+      const sunrisePaths = first.layers
+        .flatMap((layer) => layer.shapes)
+        .filter((shape): shape is PathShape => shape.kind === "path");
+      const strokeWidths = sunrisePaths.map((path) => path.strokeWidth ?? 0);
+
+      expect(first).toEqual(second);
+      expect(first.layers.map((layer) => layer.id)).toEqual(["sunrise"]);
+      expect(sunrisePaths.length).toBeGreaterThanOrEqual(3);
+      expect(
+        sunrisePaths.every(
+          (path) => path.fill === "none" && path.stroke !== "none" && path.stroke?.role === "primary",
+        ),
+      ).toBe(true);
+      expect(new Set(strokeWidths).size).toBeGreaterThanOrEqual(3);
+      expect(Math.min(...strokeWidths)).toBeLessThanOrEqual(9);
+      expect(Math.max(...strokeWidths)).toBeGreaterThanOrEqual(24);
+      expect(Math.max(...strokeWidths) - Math.min(...strokeWidths)).toBeGreaterThanOrEqual(15);
+    }
+  });
+
+  test("squares generator uses multiple outlines with visible deterministic stroke-width spread", () => {
+    for (const seed of ["ashley@fuel.build", "7db79f08-6b58-434d-a58d-3309b9eb0975"]) {
+      const input = { seed, type: "squares", vibe: "stealth" };
+      const first = getAvatarGenerator("squares")!.generate(createAvatarContext(input));
+      const second = getAvatarGenerator("squares")!.generate(createAvatarContext(input));
+      const squarePaths = first.layers
+        .flatMap((layer) => layer.shapes)
+        .filter((shape): shape is PathShape => shape.kind === "path");
+      const strokeWidths = squarePaths.map((path) => path.strokeWidth ?? 0);
+
+      expect(first).toEqual(second);
+      expect(first.layers.map((layer) => layer.id)).toEqual(["squares"]);
+      expect(squarePaths.length).toBeGreaterThanOrEqual(2);
+      expect(
+        squarePaths.every(
+          (path) => path.fill === "none" && path.stroke !== "none" && path.stroke?.role === "primary",
+        ),
+      ).toBe(true);
+      expect(new Set(strokeWidths).size).toBeGreaterThanOrEqual(2);
+      expect(Math.min(...strokeWidths)).toBeLessThanOrEqual(9);
+      expect(Math.max(...strokeWidths)).toBeGreaterThanOrEqual(22);
+      expect(Math.max(...strokeWidths) - Math.min(...strokeWidths)).toBeGreaterThanOrEqual(13);
+    }
+  });
+
   test("every implemented type renders a valid non-empty 512 viewBox SVG", () => {
     for (const type of ALL_AVATAR_TYPES) {
       const generator = getAvatarGenerator(type)!;

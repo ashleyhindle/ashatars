@@ -18,7 +18,7 @@ import {
   MIN_CIRCLES_VISIBLE_FRACTION,
   visibleCircleFractionAfterAvatarClip,
 } from "../../src/avatar/types/circles";
-import { generateDots } from "../../src/avatar/types/dots";
+import { DOT_COUNTS, generateDots } from "../../src/avatar/types/dots";
 import type { CircleShape } from "../../src/avatar/render";
 
 const PUBLIC_TYPES = [
@@ -227,6 +227,33 @@ describe("dots avatar exemplar", () => {
     expect(artwork.layers[0]?.shapes.every((shape) => shape.kind === "circle")).toBe(true);
   });
 
+  test("allows low dot counts while keeping dots large enough for thumbnails", () => {
+    expect(Math.min(...DOT_COUNTS)).toBe(3);
+    expect(Math.max(...DOT_COUNTS)).toBeLessThanOrEqual(18);
+
+    const lowCountArtwork = Array.from({ length: 80 }, (_, index) =>
+      generateDots(
+        createAvatarContext({
+          seed: `low-dot-count-${index}`,
+          type: "dots",
+          vibe: "stealth",
+        }),
+      ),
+    ).find((artwork) => artwork.layers[0]!.shapes.length === 3);
+
+    expect(lowCountArtwork).toBeDefined();
+    const shapes = lowCountArtwork!.layers.flatMap((layer) => layer.shapes) as CircleShape[];
+    const xs = shapes.map((shape) => shape.cx);
+    const ys = shapes.map((shape) => shape.cy);
+
+    expect(shapes).toHaveLength(3);
+    expect(shapes.every((shape) => shape.r >= 22)).toBe(true);
+    expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThanOrEqual(180);
+    expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThanOrEqual(180);
+    expect(Math.hypot(average(xs) - 256, average(ys) - 256)).toBeLessThanOrEqual(80);
+    expect(shapes.every((shape) => Math.hypot(shape.cx - 256, shape.cy - 256) + shape.r <= 228)).toBe(true);
+  });
+
   test("keeps representative dots legible, centered, and broadly distributed", () => {
     for (const seed of ["ashley@fuel.build", "7db79f08-6b58-434d-a58d-3309b9eb0975"]) {
       const artwork = generateDots(
@@ -283,7 +310,7 @@ describe("dots avatar exemplar", () => {
     if (first.ok && second.ok) {
       expect(first.value.svg).toBe(second.value.svg);
       expect(hashHex(["snapshot", first.value.svg])).toBe(
-        "ad987d87e3140b8235d35dfc63630eba",
+        "bdc7f57049150a947a743aae8c7b3148",
       );
     }
   });
