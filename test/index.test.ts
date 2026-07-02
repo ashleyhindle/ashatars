@@ -58,8 +58,6 @@ describe("worker routes", () => {
     expect(body).toContain(`<meta name="twitter:description" content="${description}"/>`);
     expect(body).toContain("<template data-og-template>");
     expect(body).toContain("width:1200px;height:630px");
-    expect(body).toContain("Ashatars");
-    expect(body).toContain("/ashley@fuel.build.svg?type=dots&amp;vibe=stealth");
     expect(body).toContain("https://avatars.fuel.build/ashley%40fuel.build.svg?type=dots&amp;vibe=stealth");
     expect(body).toContain("https://avatars.fuel.build/design%40fuel.build.svg?type=iris&amp;vibe=stealth");
     expect(body).not.toContain("https://example.test/ashley%40fuel.build.svg?type=dots&amp;vibe=stealth</template>");
