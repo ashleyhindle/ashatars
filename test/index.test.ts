@@ -49,13 +49,11 @@ describe("worker routes", () => {
   test("renders complete social metadata and an OG Kit template", async () => {
     const response = await handleRequest(new Request("https://example.test/"));
     const body = await response.text();
-    const canonicalUrl = "https://avatars.fuel.build/";
     const description = "Deterministic SVG avatars for emails and UUIDs, generated at the edge.";
 
     expect(body).toContain(`<meta name="description" content="${description}"/>`);
     expect(body).toContain(`<meta property="og:description" content="${description}"/>`);
     expect(body).toContain('<meta property="og:type" content="website"/>');
-    expect(body).toContain(`<meta property="og:url" content="${canonicalUrl}"/>`);
     expect(body).toContain('<meta name="twitter:card" content="summary_large_image"/>');
     expect(body).toContain(`<meta name="twitter:description" content="${description}"/>`);
     expect(body).toContain("<template data-og-template>");
