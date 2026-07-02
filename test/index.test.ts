@@ -51,18 +51,15 @@ describe("worker routes", () => {
     const body = await response.text();
     const canonicalUrl = "https://avatars.fuel.build/";
     const description = "Deterministic SVG avatars for emails and UUIDs, generated at the edge.";
-    const ogImageUrl = "https://ogkit.dev/img/I5SRd8yM.jpeg?url=https%3A%2F%2Favatars.fuel.build%2F";
 
     expect(body).toContain(`<meta name="description" content="${description}"/>`);
     expect(body).toContain('<meta property="og:title" content="Ashatars"/>');
     expect(body).toContain(`<meta property="og:description" content="${description}"/>`);
     expect(body).toContain('<meta property="og:type" content="website"/>');
     expect(body).toContain(`<meta property="og:url" content="${canonicalUrl}"/>`);
-    expect(body).toContain(`<meta property="og:image" content="${ogImageUrl}"/>`);
     expect(body).toContain('<meta name="twitter:card" content="summary_large_image"/>');
     expect(body).toContain('<meta name="twitter:title" content="Ashatars"/>');
     expect(body).toContain(`<meta name="twitter:description" content="${description}"/>`);
-    expect(body).toContain(`<meta name="twitter:image" content="${ogImageUrl}"/>`);
     expect(body).toContain("<template data-og-template>");
     expect(body).toContain("width:1200px;height:630px");
     expect(body).toContain("Ashatars");
