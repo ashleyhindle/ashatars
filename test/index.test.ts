@@ -1,13 +1,24 @@
 import { describe, expect, test } from "bun:test";
 import worker, { handleRequest } from "../src/index";
+import { SUPPORTED_AVATAR_TYPES, SUPPORTED_VIBES } from "../src/avatar";
 
-describe("worker scaffold", () => {
-  test("returns a minimal homepage response", async () => {
+describe("worker routes", () => {
+  test("returns the gallery homepage", async () => {
     const response = await handleRequest(new Request("https://example.test/"));
+    const body = await response.text();
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toBe("text/plain; charset=utf-8");
-    expect(await response.text()).toContain("Ashatars");
+    expect(response.headers.get("content-type")).toBe("text/html; charset=utf-8");
+    expect(body).toContain("<h1");
+    expect(body).toContain("Ashatars");
+    expect(body).toContain('id="vibe"');
+    for (const type of SUPPORTED_AVATAR_TYPES) {
+      expect(body).toContain(`data-avatar-type="${type}"`);
+      expect(body).toContain(`/ashley%40fuel.build.svg?type=${type}&amp;vibe=daybreak`);
+    }
+    for (const vibe of SUPPORTED_VIBES) {
+      expect(body).toContain(`value="${vibe}"`);
+    }
   });
 
   test("exports a Cloudflare Worker fetch handler", async () => {
@@ -18,6 +29,42 @@ describe("worker scaffold", () => {
     );
 
     expect(response.status).toBe(200);
+  });
+
+  test("returns SVG avatars with immutable cache and CORS headers", async () => {
+    const response = await handleRequest(
+      new Request("https://example.test/ashley@fuel.build.svg?type=dots&vibe=ocean"),
+    );
+    const body = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("image/svg+xml; charset=utf-8");
+    expect(response.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
+    expect(response.headers.get("access-control-allow-origin")).toBe("*");
+    expect(body).toStartWith('<svg xmlns="http://www.w3.org/2000/svg"');
+    expect(body).toContain('viewBox="0 0 512 512"');
+  });
+
+  test("returns byte-stable avatar bodies across repeated route requests", async () => {
+    const url = "https://example.test/7db79f08-6b58-434d-a58d-3309b9eb0975.svg?types=dots,dots&vibe=daybreak";
+    const first = await handleRequest(new Request(url)).text();
+    const second = await handleRequest(new Request(url)).text();
+
+    expect(first).toBe(second);
+  });
+
+  test("rejects invalid type and vibe params", async () => {
+    const invalidType = await handleRequest(
+      new Request("https://example.test/ashley@fuel.build.svg?type=clock"),
+    );
+    const invalidVibe = await handleRequest(
+      new Request("https://example.test/ashley@fuel.build.svg?vibe=nope"),
+    );
+
+    expect(invalidType.status).toBe(400);
+    expect(await invalidType.text()).toContain("Unsupported avatar type");
+    expect(invalidVibe.status).toBe(400);
+    expect(await invalidVibe.text()).toContain("Unsupported avatar vibe");
   });
 
   test("does not add the deferred /avatar route", async () => {
