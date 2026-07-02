@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import worker, { handleRequest } from "../src/index";
+import worker, { avatarPath, handleRequest } from "../src/index";
 import { SUPPORTED_AVATAR_TYPES, SUPPORTED_VIBES } from "../src/avatar";
 
 describe("worker routes", () => {
@@ -11,20 +11,45 @@ describe("worker routes", () => {
     expect(response.headers.get("content-type")).toBe("text/html; charset=utf-8");
     expect(body).toContain("<h1");
     expect(body).toContain("Ashatars");
+    expect(body).not.toContain("Deterministic SVG avatars for one seed");
     expect(body).toContain('id="vibe"');
     expect(body).toContain('id="refresh-seed"');
     expect(body).toContain('id="seed-value"');
+    expect(body).toContain('id="builder-seed"');
+    expect(body).toContain('id="builder-vibe"');
+    expect(body).toContain('id="builder-url"');
+    expect(body).toContain('id="copy-url"');
     expect(body).toContain('class="avatar-thumb"');
+    expect(body).toContain('width="80" height="80"');
+    expect(body).toContain('class="avatar-url" data-avatar-url');
+    expect(body).toContain('name="builder-type"');
+    expect(body).toContain("types=circles,lines,grid");
     expect(body).toContain("border-radius: 50%");
+    expect(body).toContain("appearance: none");
+    expect(body).toContain("padding-right: 40px");
     expect(body).toContain("crypto.randomUUID");
     expect(body).toContain("fallbackUuid");
+    expect(body).toContain("navigator.clipboard.writeText");
     for (const type of SUPPORTED_AVATAR_TYPES) {
       expect(body).toContain(`data-avatar-type="${type}"`);
-      expect(body).toContain(`/ashley%40fuel.build.svg?type=${type}&amp;vibe=daybreak`);
+      expect(body).toContain(`https://example.test/ashley%40fuel.build.svg?type=${type}&amp;vibe=daybreak`);
+      expect(body).toContain(`value="${type}" checked`);
     }
     for (const vibe of SUPPORTED_VIBES) {
       expect(body).toContain(`value="${vibe}"`);
     }
+  });
+
+  test("builds avatar paths with single type and deterministic type-list semantics", () => {
+    expect(avatarPath("ashley@fuel.build", { type: "dots", vibe: "ocean" })).toBe(
+      "/ashley%40fuel.build.svg?type=dots&vibe=ocean",
+    );
+    expect(avatarPath("ashley@fuel.build", { types: ["dots"], vibe: "ocean" })).toBe(
+      "/ashley%40fuel.build.svg?type=dots&vibe=ocean",
+    );
+    expect(avatarPath("ashley@fuel.build", { types: ["dots", "lines", "wave"], vibe: "ocean" })).toBe(
+      "/ashley%40fuel.build.svg?types=dots,lines,wave&vibe=ocean",
+    );
   });
 
   test("exports a Cloudflare Worker fetch handler", async () => {
