@@ -9,7 +9,7 @@ import { FAVICON_SVG } from "./favicon";
 
 export interface Env {}
 
-const CANONICAL_HOMEPAGE_URL = "https://avatars.fuel.build/?v=3";
+const CANONICAL_HOMEPAGE_URL = "https://avatars.fuel.build/?v=4";
 const HOMEPAGE_SOCIAL_TITLE = "Fuel Avatars";
 const HOMEPAGE_SOCIAL_DESCRIPTION = "Deterministic SVG avatars for emails and UUIDs, generated at the edge.";
 const OG_KIT_IMAGE_URL = `https://ogkit.dev/img/I5SRd8yM.jpeg?url=${encodeURIComponent(CANONICAL_HOMEPAGE_URL)}`;
@@ -158,7 +158,6 @@ export function renderHomepage(origin = "https://example.test"): string {
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="description" content="${escapeAttribute(HOMEPAGE_SOCIAL_DESCRIPTION)}"/>
     <meta property="og:title" content="${escapeAttribute(HOMEPAGE_SOCIAL_TITLE)}"/>
-  <script defer src="https://cdn.jsdelivr.net/npm/ogkit@1"></script>
 
     <meta property="og:description" content="${escapeAttribute(HOMEPAGE_SOCIAL_DESCRIPTION)}"/>
     <meta property="og:type" content="website"/>
