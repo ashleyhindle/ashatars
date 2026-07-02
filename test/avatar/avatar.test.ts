@@ -15,6 +15,7 @@ import {
 } from "../../src/avatar";
 import { generateCircles } from "../../src/avatar/types/circles";
 import { generateDots } from "../../src/avatar/types/dots";
+import type { CircleShape } from "../../src/avatar/render";
 
 const PUBLIC_TYPES = [
   "circles",
@@ -222,6 +223,45 @@ describe("dots avatar exemplar", () => {
     expect(artwork.layers[0]?.shapes.every((shape) => shape.kind === "circle")).toBe(true);
   });
 
+  test("keeps representative dots legible, centered, and broadly distributed", () => {
+    for (const seed of ["ashley@fuel.build", "7db79f08-6b58-434d-a58d-3309b9eb0975"]) {
+      const artwork = generateDots(
+        createAvatarContext({
+          seed,
+          type: "dots",
+          vibe: "stealth",
+        }),
+      );
+      const shapes = artwork.layers.flatMap((layer) => layer.shapes) as CircleShape[];
+      const xs = shapes.map((shape) => shape.cx);
+      const ys = shapes.map((shape) => shape.cy);
+      const quadrants = new Set(
+        shapes.map((shape) => `${shape.cx >= 256 ? "r" : "l"}${shape.cy >= 256 ? "b" : "t"}`),
+      );
+      const averageX = average(xs);
+      const averageY = average(ys);
+
+      expect(shapes.length).toBeGreaterThanOrEqual(8);
+      expect(shapes.every((shape) => shape.r >= 18)).toBe(true);
+      expect(shapes.every((shape) => shape.r <= 40)).toBe(true);
+      expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThanOrEqual(300);
+      expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThanOrEqual(300);
+      expect(quadrants.size).toBeGreaterThanOrEqual(4);
+      expect(averageX).toBeGreaterThanOrEqual(190);
+      expect(averageX).toBeLessThanOrEqual(322);
+      expect(averageY).toBeGreaterThanOrEqual(190);
+      expect(averageY).toBeLessThanOrEqual(322);
+
+      for (const shape of shapes) {
+        expect(shape.cx - shape.r).toBeGreaterThanOrEqual(0);
+        expect(shape.cy - shape.r).toBeGreaterThanOrEqual(0);
+        expect(shape.cx + shape.r).toBeLessThanOrEqual(512);
+        expect(shape.cy + shape.r).toBeLessThanOrEqual(512);
+        expect(Math.hypot(shape.cx - 256, shape.cy - 256) + shape.r).toBeLessThanOrEqual(228);
+      }
+    }
+  });
+
   test("renders byte-identical SVG for the same seed, type, and vibe", () => {
     const first = createAvatarSvg({
       seed: "  ASHLEY@FUEL.BUILD ",
@@ -239,7 +279,7 @@ describe("dots avatar exemplar", () => {
     if (first.ok && second.ok) {
       expect(first.value.svg).toBe(second.value.svg);
       expect(hashHex(["snapshot", first.value.svg])).toBe(
-        "6abffd6873bddaf9c4a8e3241fb52d32",
+        "ad987d87e3140b8235d35dfc63630eba",
       );
     }
   });
@@ -278,6 +318,10 @@ function markColors(svg: string): string[] {
       [...svg.matchAll(/(?:fill|stroke)="(#[0-9a-f]{6})"/g)].map((match) => match[1]!),
     ),
   ];
+}
+
+function average(values: readonly number[]): number {
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
 describe("circles avatar generator", () => {
