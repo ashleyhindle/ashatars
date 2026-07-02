@@ -66,21 +66,23 @@ Successful SVG responses include:
 ## Wrangler Deploy Notes
 
 `wrangler.jsonc` contains deploy-ready Worker metadata, `main`,
-`compatibility_date`, observability, and a placeholder custom-domain section.
-Do not deploy this slice live until the production account/domain are confirmed.
-
-When ready, replace the placeholder route with the real hostname:
+`compatibility_date`, observability, and the production custom domain route:
 
 ```jsonc
 "routes": [
-  { "pattern": "avatars.example.com", "custom_domain": true }
+  { "pattern": "avatars.fuel.build", "custom_domain": true }
 ]
 ```
 
-Then run:
+Before deploying, verify the Worker:
 
 ```bash
 bun run typecheck
 bun test
+```
+
+Then deploy when the release task is ready:
+
+```bash
 bunx wrangler deploy
 ```

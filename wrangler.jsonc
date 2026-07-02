@@ -6,10 +6,7 @@
   "observability": {
     "enabled": true
   },
-  // Replace this placeholder with the production host before deploying a custom domain.
-  // Example:
-  // "routes": [
-  //   { "pattern": "avatars.example.com", "custom_domain": true }
-  // ]
-  "routes": []
+  "routes": [
+    { "pattern": "avatars.fuel.build", "custom_domain": true }
+  ]
 }
