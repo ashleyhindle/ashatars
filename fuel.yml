@@ -1,0 +1,24 @@
+# autoStart runs this codebase's dev environment when the Fuel daemon starts.
+# Workspaces still start run processes when they are created.
+autoStart: true
+
+# setup runs in generated workspaces after Fuel copies the source repo.
+# FUEL_CODEBASE_PATH is the registered source codebase path.
+# Fuel expands $FUEL_PORT_BASE and ${FUEL_PORT_BASE+N} in setup/run/teardown commands.
+setup:
+  - command -v bun
+  - 'if [ -f bun.lock ]; then bun install --frozen-lockfile; else bun install; fi'
+
+# run processes are daemon-owned long-lived commands.
+# FUEL_PORT_BASE is the first reserved port for this context.
+# FUEL_WORKSPACE_PATH is the current workspace/codebase root.
+# Fuel expands $FUEL_PORT_BASE and ${FUEL_PORT_BASE+N} in commands and URL hints.
+run:
+  - app:
+      command: "bun run dev -- --local --ip 127.0.0.1 --port $FUEL_PORT_BASE --show-interactive-dev-session false"
+      cwd: "."
+      autoRestart: true
+      url: "http://127.0.0.1:${FUEL_PORT_BASE}"
+
+# teardown is parsed now; command execution is not wired yet.
+teardown: []
