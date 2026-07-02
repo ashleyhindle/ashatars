@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import {
+  ALL_AVATAR_TYPES,
   createAvatarContext,
   createRng,
   renderAvatarSvg,
-  SUPPORTED_AVATAR_TYPES,
   VIBES,
 } from "../../src/avatar";
 import { getAvatarGenerator } from "../../src/avatar/types";
@@ -53,8 +53,8 @@ const EXPECTED_SHAPES: Record<string, readonly AvatarShape["kind"][]> = {
 };
 
 describe("ref-inspired avatar generators", () => {
-  test("every supported type returns deterministic simple structured geometry", () => {
-    for (const type of SUPPORTED_AVATAR_TYPES) {
+  test("every implemented type returns deterministic simple structured geometry", () => {
+    for (const type of ALL_AVATAR_TYPES) {
       const generator = getAvatarGenerator(type);
       expect(generator).toBeDefined();
       if (!generator) {
@@ -86,8 +86,8 @@ describe("ref-inspired avatar generators", () => {
     expect(pathsFor("wiggles").every((path) => path.d.includes("S"))).toBe(true);
   });
 
-  test("every supported type renders a valid non-empty 512 viewBox SVG", () => {
-    for (const type of SUPPORTED_AVATAR_TYPES) {
+  test("every implemented type renders a valid non-empty 512 viewBox SVG", () => {
+    for (const type of ALL_AVATAR_TYPES) {
       const generator = getAvatarGenerator(type)!;
       const ctx = createAvatarContext({
         seed: "7db79f08-6b58-434d-a58d-3309b9eb0975",

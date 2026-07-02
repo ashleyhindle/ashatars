@@ -28,6 +28,8 @@ describe("worker routes", () => {
     expect(body).toContain("border-radius: 50%");
     expect(body).toContain("appearance: none");
     expect(body).toContain("padding-right: 40px");
+    expect(body).toContain("position: sticky");
+    expect(body).toContain("backdrop-filter: blur");
     expect(body).toContain("crypto.randomUUID");
     expect(body).toContain("fallbackUuid");
     expect(body).toContain("navigator.clipboard.writeText");
@@ -37,6 +39,7 @@ describe("worker routes", () => {
       expect(body).toContain(`value="${type}"`);
       expect(body).not.toContain(`value="${type}" checked`);
     }
+    expect(body).not.toContain("carets");
     for (const vibe of SUPPORTED_VIBES) {
       expect(body).toContain(`value="${vibe}"`);
     }
@@ -102,6 +105,17 @@ describe("worker routes", () => {
     expect(omittedFirst).toBe(omittedSecond);
     expect(omittedFirst).toBe(explicitAll);
     expect(omittedFirst).toStartWith('<svg xmlns="http://www.w3.org/2000/svg"');
+    expect(omittedFirst).not.toContain("Ashatar carets avatar");
+  });
+
+  test("keeps direct carets route working without advertising it publicly", async () => {
+    const response = await handleRequest(
+      new Request("https://example.test/ashley@fuel.build.svg?type=carets&vibe=stealth"),
+    );
+    const body = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(body).toContain("Ashatar carets avatar");
   });
 
   test("supports documented type-list selection forms deterministically", async () => {

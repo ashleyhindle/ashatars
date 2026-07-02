@@ -8,6 +8,7 @@ import {
   resolveAvatarType,
   resolveVibe,
   renderAvatarSvg,
+  ALL_AVATAR_TYPES,
   SUPPORTED_AVATAR_TYPES,
   VIBES,
   DEFAULT_VIBE,
@@ -15,7 +16,7 @@ import {
 import { generateCircles } from "../../src/avatar/types/circles";
 import { generateDots } from "../../src/avatar/types/dots";
 
-const IMPLEMENTED_TYPES = [
+const PUBLIC_TYPES = [
   "circles",
   "lines",
   "grid",
@@ -31,8 +32,9 @@ const IMPLEMENTED_TYPES = [
   "iris",
   "wave",
   "blob_face",
-  "carets",
 ] as const;
+
+const IMPLEMENTED_TYPES = [...PUBLIC_TYPES, "carets"] as const;
 
 describe("deterministic avatar core", () => {
   test("normalizes email seeds with trim and lowercase", () => {
@@ -96,7 +98,7 @@ describe("deterministic avatar core", () => {
     expect(type.ok).toBe(false);
     if (!type.ok) {
       expect(type.error.code).toBe("invalid_type");
-      expect(type.error.supported).toEqual([...IMPLEMENTED_TYPES]);
+      expect(type.error.supported).toEqual([...PUBLIC_TYPES]);
     }
 
     expect(vibe.ok).toBe(false);
@@ -108,16 +110,19 @@ describe("deterministic avatar core", () => {
   });
 
   test("lists every implemented type once in the supported registry", () => {
-    expect(SUPPORTED_AVATAR_TYPES).toEqual([...IMPLEMENTED_TYPES]);
+    expect(ALL_AVATAR_TYPES).toEqual([...IMPLEMENTED_TYPES]);
+    expect(SUPPORTED_AVATAR_TYPES).toEqual([...PUBLIC_TYPES]);
+    expect(SUPPORTED_AVATAR_TYPES).not.toContain("carets");
+    expect(getAvatarGenerator("carets")?.type).toBe("carets");
     expect(new Set(SUPPORTED_AVATAR_TYPES).size).toBe(SUPPORTED_AVATAR_TYPES.length);
 
-    for (const type of SUPPORTED_AVATAR_TYPES) {
+    for (const type of ALL_AVATAR_TYPES) {
       expect(getAvatarGenerator(type)?.type).toBe(type);
     }
   });
 
-  test("renders every supported type through the public avatar factory", () => {
-    for (const type of SUPPORTED_AVATAR_TYPES) {
+  test("renders every implemented type through the avatar factory, including undocumented carets", () => {
+    for (const type of ALL_AVATAR_TYPES) {
       const avatar = createAvatarSvg({
         seed: "ashley@fuel.build",
         type,
@@ -156,6 +161,7 @@ describe("deterministic avatar core", () => {
       expect(defaultType.value.vibe).toBe("stealth");
       expect(SUPPORTED_AVATAR_TYPES as readonly string[]).toContain(fromTypes.value.type);
       expect(SUPPORTED_AVATAR_TYPES as readonly string[]).toContain(defaultType.value.type);
+      expect(defaultType.value.type).not.toBe("carets");
     }
   });
 

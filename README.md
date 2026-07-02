@@ -33,9 +33,9 @@ The avatar route accepts these query params:
   generator deterministically from that list.
 - `types=a,b,c` chooses one supported generator deterministically from the
   comma-separated list.
-- Omitted `type`/`types` chooses one supported generator deterministically from
-  every supported type, matching the URL builder's empty or all-selected type
-  state.
+- Omitted `type`/`types` chooses one public generator deterministically from
+  every supported public type, matching the URL builder's empty or all-selected
+  type state.
 - `vibe=<name>` selects the shared palette/background role set. Omitted `vibe`
   uses `stealth`.
 
@@ -48,12 +48,12 @@ Email seeds are trimmed and lowercased. UUID and other string seeds are trimmed
 and otherwise preserved. Supported vibes are `daybreak`, `sunset`, `ocean`,
 `forest`, `fire`, `crystal`, `ice`, `stealth`, and `bubble`.
 
-Supported types: `circles`, `lines`, `grid`, `diagonal_grid`, `squares`,
+Supported public types: `circles`, `lines`, `grid`, `diagonal_grid`, `squares`,
 `mountains`, `zigzag_vertical`, `wiggles`, `sunrise`, `clock`, `dots`,
-`concentric_arcs`, `iris`, `wave`, `blob_face`, and `carets`.
+`concentric_arcs`, `iris`, `wave`, and `blob_face`.
 
-Deferred types: none. Every type from `refs/svgs.ex` is implemented and
-advertised in the homepage gallery.
+Deferred public types: none. Public types from `refs/svgs.ex` are advertised in
+the homepage gallery.
 
 ## HTTP Headers
 

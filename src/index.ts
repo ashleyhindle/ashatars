@@ -169,11 +169,18 @@ export function renderHomepage(origin = "https://example.test"): string {
       }
 
       .masthead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 20px;
         align-items: center;
-        padding: 8px 0 24px;
+        margin: 0 -8px 18px;
+        padding: 8px 8px 10px;
+        border-bottom: 1px solid rgba(20, 20, 20, 0.14);
+        background: rgba(248, 250, 252, 0.92);
+        backdrop-filter: blur(12px);
       }
 
       h1 {
@@ -423,6 +430,8 @@ export function renderHomepage(origin = "https://example.test"): string {
 
         .masthead {
           grid-template-columns: 1fr;
+          gap: 12px;
+          margin-bottom: 12px;
         }
 
         .controls,
@@ -487,6 +496,11 @@ export function renderHomepage(origin = "https://example.test"): string {
         .builder {
           border-top-color: rgba(255, 255, 255, 0.2);
           border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .masthead {
+          border-bottom-color: rgba(255, 255, 255, 0.18);
+          background: rgba(18, 18, 18, 0.9);
         }
 
         .builder {

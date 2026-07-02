@@ -6,7 +6,7 @@ import {
   resolveAvatarType,
 } from "./core";
 import { renderAvatarSvg } from "./render";
-import { getAvatarGenerator, SUPPORTED_AVATAR_TYPES } from "./types";
+import { ALL_AVATAR_TYPES, getAvatarGenerator, SUPPORTED_AVATAR_TYPES } from "./types";
 import { DEFAULT_VIBE, resolveVibe } from "./vibes";
 
 export interface AvatarRequest {
@@ -26,9 +26,13 @@ export interface RenderedAvatar {
 
 export function createAvatarSvg(request: AvatarRequest): Result<RenderedAvatar> {
   const seed = normalizeSeed(request.seed);
+  const explicitTypeSelection =
+    Boolean(request.type?.trim()) ||
+    (request.repeatedTypes?.some((type) => Boolean(type.trim())) ?? false) ||
+    Boolean(request.types?.trim());
   const typeResult = resolveAvatarType({
     seed,
-    supportedTypes: SUPPORTED_AVATAR_TYPES,
+    supportedTypes: explicitTypeSelection ? ALL_AVATAR_TYPES : SUPPORTED_AVATAR_TYPES,
     type: request.type,
     repeatedTypes: request.repeatedTypes,
     types: request.types,
@@ -51,7 +55,7 @@ export function createAvatarSvg(request: AvatarRequest): Result<RenderedAvatar> 
         code: "invalid_type",
         message: `Unsupported avatar type: ${typeResult.value}`,
         value: typeResult.value,
-        supported: SUPPORTED_AVATAR_TYPES,
+        supported: explicitTypeSelection ? ALL_AVATAR_TYPES : SUPPORTED_AVATAR_TYPES,
       } satisfies AvatarError,
     };
   }

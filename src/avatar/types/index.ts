@@ -91,7 +91,8 @@ export const AVATAR_GENERATORS = {
 
 export type AvatarType = keyof typeof AVATAR_GENERATORS;
 
-export const SUPPORTED_AVATAR_TYPES = Object.keys(AVATAR_GENERATORS) as AvatarType[];
+export const ALL_AVATAR_TYPES = Object.keys(AVATAR_GENERATORS) as AvatarType[];
+export const SUPPORTED_AVATAR_TYPES = ALL_AVATAR_TYPES.filter((type) => type !== CARETS_TYPE);
 
 export function getAvatarGenerator(type: string): AvatarGenerator | undefined {
   return AVATAR_GENERATORS[type as AvatarType];
