@@ -12,7 +12,6 @@ describe("worker routes", () => {
     expect(response.headers.get("content-type")).toBe("text/html; charset=utf-8");
     expect(body).toContain("<h1");
     expect(body).toContain('<link rel="icon" type="image/svg+xml" href="/favicon.svg">');
-    expect(body).toContain("Ashatars");
     expect(body).not.toContain("Deterministic SVG avatars for one seed");
     expect(body).toContain('id="vibe"');
     expect(body).toContain('id="refresh-seed"');

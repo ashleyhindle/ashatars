@@ -150,7 +150,7 @@ export function renderHomepage(origin = "https://example.test"): string {
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Ashatars</title>
+    <title>Line Avatars</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
       :root {
@@ -525,7 +525,7 @@ export function renderHomepage(origin = "https://example.test"): string {
     <main>
       <section class="masthead" aria-labelledby="title">
         <div>
-          <h1 id="title">Ashatars</h1>
+          <h1 id="title">Line Avatars</h1>
           <p class="current-seed"><span class="field-label">Seed</span> <code id="seed-value">${escapeText(seed)}</code></p>
         </div>
         <div class="controls">
