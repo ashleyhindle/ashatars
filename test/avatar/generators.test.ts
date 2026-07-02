@@ -77,13 +77,38 @@ describe("ref-inspired avatar generators", () => {
   });
 
   test("representative ref motifs use the expected simple geometry", () => {
-    expect(pathsFor("lines").every((path) => /^M.+ L.+ Z$/.test(path.d))).toBe(true);
+    expect(pathsFor("lines").every((path) => /^M.+ L.+$/.test(path.d))).toBe(true);
     expect(pathsFor("grid").every((path) => /^M/.test(path.d) && path.d.includes(" L"))).toBe(true);
     expect(pathsFor("diagonal_grid").every((path) => path.d.includes(" L"))).toBe(true);
     expect(pathsFor("squares").every((path) => path.d.includes(" h") && path.d.includes(" v"))).toBe(true);
     expect(pathsFor("sunrise").every((path) => /^M0,\d+ H512$/.test(path.d))).toBe(true);
     expect(pathsFor("clock").every((path) => /^M256,256 L/.test(path.d))).toBe(true);
     expect(pathsFor("wiggles").every((path) => path.d.includes("S"))).toBe(true);
+  });
+
+  test("lines generator keeps one layer but varies deterministic segment thickness", () => {
+    for (const seed of ["ashley@fuel.build", "7db79f08-6b58-434d-a58d-3309b9eb0975"]) {
+      const input = { seed, type: "lines", vibe: "stealth" };
+      const first = getAvatarGenerator("lines")!.generate(createAvatarContext(input));
+      const second = getAvatarGenerator("lines")!.generate(createAvatarContext(input));
+      const linePaths = first.layers
+        .flatMap((layer) => layer.shapes)
+        .filter((shape): shape is PathShape => shape.kind === "path");
+      const strokeWidths = linePaths.map((path) => path.strokeWidth ?? 0);
+
+      expect(first).toEqual(second);
+      expect(first.layers.map((layer) => layer.id)).toEqual(["lines"]);
+      expect(linePaths.length).toBeGreaterThanOrEqual(3);
+      expect(
+        linePaths.every(
+          (path) => path.fill === "none" && path.stroke !== "none" && path.stroke?.role === "primary",
+        ),
+      ).toBe(true);
+      expect(new Set(strokeWidths).size).toBeGreaterThanOrEqual(3);
+      expect(Math.min(...strokeWidths)).toBeLessThanOrEqual(9);
+      expect(Math.max(...strokeWidths)).toBeGreaterThanOrEqual(19);
+      expect(Math.max(...strokeWidths) - Math.min(...strokeWidths)).toBeGreaterThanOrEqual(10);
+    }
   });
 
   test("every implemented type renders a valid non-empty 512 viewBox SVG", () => {
