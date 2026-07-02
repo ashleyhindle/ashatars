@@ -13,7 +13,11 @@ import {
   VIBES,
   DEFAULT_VIBE,
 } from "../../src/avatar";
-import { generateCircles } from "../../src/avatar/types/circles";
+import {
+  generateCircles,
+  MIN_CIRCLES_VISIBLE_FRACTION,
+  visibleCircleFractionAfterAvatarClip,
+} from "../../src/avatar/types/circles";
 import { generateDots } from "../../src/avatar/types/dots";
 import type { CircleShape } from "../../src/avatar/render";
 
@@ -325,7 +329,7 @@ function average(values: readonly number[]): number {
 }
 
 describe("circles avatar generator", () => {
-  test("returns deterministic sparse circle outlines inside the viewBox", () => {
+  test("returns deterministic sparse circle outlines with meaningful circular visibility", () => {
     const first = generateCircles(
       createAvatarContext({
         seed: "ashley@fuel.build",
@@ -345,16 +349,56 @@ describe("circles avatar generator", () => {
     expect(first.layers.map((layer) => layer.id)).toEqual(["circles"]);
 
     const shapes = first.layers.flatMap((layer) => layer.shapes);
-    expect([1, 3, 4]).toContain(shapes.length);
+    expect(shapes.length).toBeGreaterThanOrEqual(2);
+    expect(shapes.length).toBeLessThanOrEqual(7);
     expect(shapes.every((shape) => shape.kind === "circle")).toBe(true);
 
     for (const shape of shapes) {
       expect(shape.kind).toBe("circle");
       if (shape.kind === "circle") {
-        expect(shape.cx - shape.r).toBeGreaterThanOrEqual(0);
-        expect(shape.cy - shape.r).toBeGreaterThanOrEqual(0);
-        expect(shape.cx + shape.r).toBeLessThanOrEqual(512);
-        expect(shape.cy + shape.r).toBeLessThanOrEqual(512);
+        expect(visibleCircleFractionAfterAvatarClip(shape)).toBeGreaterThanOrEqual(
+          MIN_CIRCLES_VISIBLE_FRACTION,
+        );
+      }
+    }
+  });
+
+  test("keeps the reported stealth circles seed from becoming a corner-only speck", () => {
+    const artwork = generateCircles(
+      createAvatarContext({
+        seed: "2ad060ea-d437-4435-a453-27ee0ea660a3",
+        type: "circles",
+        vibe: "stealth",
+      }),
+    );
+    const shapes = artwork.layers.flatMap((layer) => layer.shapes) as CircleShape[];
+
+    expect(shapes.length).toBeGreaterThanOrEqual(2);
+    expect(shapes.length).toBeLessThanOrEqual(7);
+    expect(
+      shapes.every((shape) => visibleCircleFractionAfterAvatarClip(shape) >= MIN_CIRCLES_VISIBLE_FRACTION),
+    ).toBe(true);
+  });
+
+  test("keeps circles count and circular-clip visibility invariant across representative seeds", () => {
+    for (const seed of [
+      "ashley@fuel.build",
+      "2ad060ea-d437-4435-a453-27ee0ea660a3",
+      "7db79f08-6b58-434d-a58d-3309b9eb0975",
+      "Mixed Case Team",
+      "corner regression",
+    ]) {
+      for (const vibe of ["daybreak", "stealth", "ocean"]) {
+        const artwork = generateCircles(createAvatarContext({ seed, type: "circles", vibe }));
+        const shapes = artwork.layers.flatMap((layer) => layer.shapes) as CircleShape[];
+
+        expect(shapes.length).toBeGreaterThanOrEqual(2);
+        expect(shapes.length).toBeLessThanOrEqual(7);
+        expect(
+          shapes.every(
+            (shape) => visibleCircleFractionAfterAvatarClip(shape) >= MIN_CIRCLES_VISIBLE_FRACTION,
+          ),
+        ).toBe(true);
       }
     }
   });
