@@ -23,7 +23,8 @@ describe("worker routes", () => {
     expect(body).toContain('width="80" height="80"');
     expect(body).toContain('class="avatar-url" data-avatar-url');
     expect(body).toContain('name="builder-type"');
-    expect(body).toContain("types=circles,lines,grid");
+    expect(body).toContain("https://example.test/ashley%40fuel.build.svg?vibe=stealth");
+    expect(body).not.toContain("types=circles,lines,grid");
     expect(body).toContain("border-radius: 50%");
     expect(body).toContain("appearance: none");
     expect(body).toContain("padding-right: 40px");
@@ -32,8 +33,9 @@ describe("worker routes", () => {
     expect(body).toContain("navigator.clipboard.writeText");
     for (const type of SUPPORTED_AVATAR_TYPES) {
       expect(body).toContain(`data-avatar-type="${type}"`);
-      expect(body).toContain(`https://example.test/ashley%40fuel.build.svg?type=${type}&amp;vibe=daybreak`);
-      expect(body).toContain(`value="${type}" checked`);
+      expect(body).toContain(`https://example.test/ashley%40fuel.build.svg?type=${type}&amp;vibe=stealth`);
+      expect(body).toContain(`value="${type}"`);
+      expect(body).not.toContain(`value="${type}" checked`);
     }
     for (const vibe of SUPPORTED_VIBES) {
       expect(body).toContain(`value="${vibe}"`);
@@ -49,6 +51,12 @@ describe("worker routes", () => {
     );
     expect(avatarPath("ashley@fuel.build", { types: ["dots", "lines", "wave"], vibe: "ocean" })).toBe(
       "/ashley%40fuel.build.svg?types=dots,lines,wave&vibe=ocean",
+    );
+    expect(avatarPath("ashley@fuel.build", { vibe: "stealth" })).toBe(
+      "/ashley%40fuel.build.svg?vibe=stealth",
+    );
+    expect(avatarPath("ashley@fuel.build", { types: SUPPORTED_AVATAR_TYPES, vibe: "stealth" })).toBe(
+      "/ashley%40fuel.build.svg?vibe=stealth",
     );
   });
 
@@ -82,6 +90,18 @@ describe("worker routes", () => {
     const second = await handleRequest(new Request(url)).text();
 
     expect(first).toBe(second);
+  });
+
+  test("omitted type params use deterministic all-types selection", async () => {
+    const omittedUrl = "https://example.test/ashley@fuel.build.svg?vibe=stealth";
+    const allTypesUrl = `https://example.test/ashley@fuel.build.svg?types=${SUPPORTED_AVATAR_TYPES.join(",")}&vibe=stealth`;
+    const omittedFirst = await handleRequest(new Request(omittedUrl)).text();
+    const omittedSecond = await handleRequest(new Request(omittedUrl)).text();
+    const explicitAll = await handleRequest(new Request(allTypesUrl)).text();
+
+    expect(omittedFirst).toBe(omittedSecond);
+    expect(omittedFirst).toBe(explicitAll);
+    expect(omittedFirst).toStartWith('<svg xmlns="http://www.w3.org/2000/svg"');
   });
 
   test("supports documented type-list selection forms deterministically", async () => {
@@ -124,7 +144,7 @@ describe("worker routes", () => {
     const readme = await Bun.file("README.md").text();
     const examples = [
       "/ashley@fuel.build.svg?type=dots&vibe=ocean",
-      "/7db79f08-6b58-434d-a58d-3309b9eb0975.svg?types=dots,lines,wave&vibe=daybreak",
+      "/7db79f08-6b58-434d-a58d-3309b9eb0975.svg?types=dots,lines,wave&vibe=stealth",
     ];
 
     for (const path of examples) {

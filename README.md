@@ -16,14 +16,15 @@ avatar endpoint.
 
 - `/` returns the local docs/gallery homepage with circular generated examples
   for `ashley@fuel.build`, a vibe selector, and a refresh button that swaps the
-  whole gallery to a random UUID seed.
+  whole gallery to a random UUID seed. The homepage and builder default to the
+  `stealth` vibe.
 - `/:seed.svg` returns a deterministic SVG avatar.
 - `/avatar/:seed.svg` is intentionally absent and returns `404`.
 
 Examples:
 
 - `/ashley@fuel.build.svg?type=dots&vibe=ocean`
-- `/7db79f08-6b58-434d-a58d-3309b9eb0975.svg?types=dots,lines,wave&vibe=daybreak`
+- `/7db79f08-6b58-434d-a58d-3309b9eb0975.svg?types=dots,lines,wave&vibe=stealth`
 
 The avatar route accepts these query params:
 
@@ -32,7 +33,11 @@ The avatar route accepts these query params:
   generator deterministically from that list.
 - `types=a,b,c` chooses one supported generator deterministically from the
   comma-separated list.
-- `vibe=<name>` selects the shared palette/background role set.
+- Omitted `type`/`types` chooses one supported generator deterministically from
+  every supported type, matching the URL builder's empty or all-selected type
+  state.
+- `vibe=<name>` selects the shared palette/background role set. Omitted `vibe`
+  uses `stealth`.
 
 Invalid `type`, `types`, or `vibe` values return `400`. The same normalized
 seed, selected type policy, and vibe always produce identical SVG bytes.

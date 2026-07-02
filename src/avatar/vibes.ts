@@ -1,6 +1,6 @@
 import type { AvatarError, Result } from "./core";
 
-export const DEFAULT_VIBE = "daybreak";
+export const DEFAULT_VIBE = "stealth";
 
 export type PaletteRole = "primary" | "secondary" | "accent" | "soft" | "contrast";
 

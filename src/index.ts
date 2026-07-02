@@ -129,13 +129,12 @@ export function renderHomepage(origin = "https://example.test"): string {
   const typeChoices = SUPPORTED_AVATAR_TYPES.map((type) => {
     return [
       `<label class="type-choice">`,
-      `<input type="checkbox" name="builder-type" value="${escapeAttribute(type)}" checked/>`,
+      `<input type="checkbox" name="builder-type" value="${escapeAttribute(type)}"/>`,
       `<span>${escapeText(typeLabel(type))}</span>`,
       "</label>",
     ].join("");
   }).join("");
   const builderUrl = avatarUrl(origin, seed, {
-    types: SUPPORTED_AVATAR_TYPES,
     vibe: DEFAULT_VIBE,
   });
 
@@ -595,11 +594,13 @@ export function renderHomepage(origin = "https://example.test"): string {
       const buildPath = (seed, options) => {
         const params = [];
         const types = options.types || [];
+        const allTypes = ${JSON.stringify(SUPPORTED_AVATAR_TYPES)};
+        const selectedAllTypes = types.length === allTypes.length && allTypes.every((type) => types.includes(type));
         if (options.type) {
           params.push("type=" + encodeURIComponent(options.type));
         } else if (types.length === 1) {
           params.push("type=" + encodeURIComponent(types[0]));
-        } else if (types.length > 1) {
+        } else if (types.length > 1 && !selectedAllTypes) {
           params.push("types=" + types.map((type) => encodeURIComponent(type)).join(","));
         }
         if (options.vibe) {
@@ -678,7 +679,7 @@ export function avatarPath(
     params.push(`type=${encodeURIComponent(options.type)}`);
   } else if (options.types?.length === 1) {
     params.push(`type=${encodeURIComponent(options.types[0])}`);
-  } else if (options.types && options.types.length > 1) {
+  } else if (options.types && options.types.length > 1 && !hasAllSupportedTypes(options.types)) {
     params.push(`types=${options.types.map((type) => encodeURIComponent(type)).join(",")}`);
   }
   if (options.vibe) {
@@ -690,6 +691,11 @@ export function avatarPath(
 
 function avatarUrl(origin: string, seed: string, options: Parameters<typeof avatarPath>[1]): string {
   return `${origin}${avatarPath(seed, options)}`;
+}
+
+function hasAllSupportedTypes(types: readonly string[]): boolean {
+  const selected = new Set(types);
+  return selected.size === SUPPORTED_AVATAR_TYPES.length && SUPPORTED_AVATAR_TYPES.every((type) => selected.has(type));
 }
 
 function typeLabel(type: string): string {

@@ -10,6 +10,7 @@ import {
   renderAvatarSvg,
   SUPPORTED_AVATAR_TYPES,
   VIBES,
+  DEFAULT_VIBE,
 } from "../../src/avatar";
 import { generateCircles } from "../../src/avatar/types/circles";
 import { generateDots } from "../../src/avatar/types/dots";
@@ -102,6 +103,7 @@ describe("deterministic avatar core", () => {
     if (!vibe.ok) {
       expect(vibe.error.code).toBe("invalid_vibe");
       expect(vibe.error.supported).toContain("daybreak");
+      expect(vibe.error.supported).toContain("stealth");
     }
   });
 
@@ -130,21 +132,18 @@ describe("deterministic avatar core", () => {
     }
   });
 
-  test("selects deterministic supported types for types= and no explicit type", () => {
+  test("selects deterministic supported types from all types when type params are omitted", () => {
     const supported = SUPPORTED_AVATAR_TYPES.join(",");
     const fromTypes = createAvatarSvg({
       seed: "ashley@fuel.build",
       types: supported,
-      vibe: "ocean",
     });
     const fromTypesAgain = createAvatarSvg({
       seed: "ashley@fuel.build",
       types: supported,
-      vibe: "ocean",
     });
     const defaultType = createAvatarSvg({
       seed: "ashley@fuel.build",
-      vibe: "ocean",
     });
 
     expect(fromTypes.ok).toBe(true);
@@ -152,6 +151,9 @@ describe("deterministic avatar core", () => {
     expect(defaultType.ok).toBe(true);
     if (fromTypes.ok && fromTypesAgain.ok && defaultType.ok) {
       expect(fromTypes.value.type).toBe(fromTypesAgain.value.type);
+      expect(fromTypes.value.type).toBe(defaultType.value.type);
+      expect(fromTypes.value.vibe).toBe(DEFAULT_VIBE);
+      expect(defaultType.value.vibe).toBe("stealth");
       expect(SUPPORTED_AVATAR_TYPES as readonly string[]).toContain(fromTypes.value.type);
       expect(SUPPORTED_AVATAR_TYPES as readonly string[]).toContain(defaultType.value.type);
     }
