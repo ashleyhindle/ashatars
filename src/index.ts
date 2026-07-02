@@ -5,6 +5,7 @@ import {
   SUPPORTED_VIBES,
   VIBES,
 } from "./avatar";
+import { FAVICON_SVG } from "./favicon";
 
 export interface Env {}
 
@@ -50,6 +51,12 @@ export function handleRequest(request: Request): Response {
 
   if (url.pathname === "/") {
     return htmlResponse(renderHomepage(url.origin));
+  }
+
+  if (url.pathname === "/favicon.svg") {
+    return new Response(FAVICON_SVG, {
+      headers: SVG_HEADERS,
+    });
   }
 
   if (/^\/[^/]+\.svg$/.test(url.pathname)) {
@@ -144,6 +151,7 @@ export function renderHomepage(origin = "https://example.test"): string {
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Ashatars SVG gallery</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
       :root {
         color-scheme: light dark;

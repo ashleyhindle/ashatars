@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { FAVICON_SVG } from "../src/favicon";
 import worker, { avatarPath, handleRequest } from "../src/index";
 import { SUPPORTED_AVATAR_TYPES, SUPPORTED_VIBES } from "../src/avatar";
 
@@ -10,6 +11,7 @@ describe("worker routes", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toBe("text/html; charset=utf-8");
     expect(body).toContain("<h1");
+    expect(body).toContain('<link rel="icon" type="image/svg+xml" href="/favicon.svg">');
     expect(body).toContain("Ashatars");
     expect(body).not.toContain("Deterministic SVG avatars for one seed");
     expect(body).toContain('id="vibe"');
@@ -85,6 +87,19 @@ describe("worker routes", () => {
     expect(response.headers.get("access-control-allow-origin")).toBe("*");
     expect(body).toStartWith('<svg xmlns="http://www.w3.org/2000/svg"');
     expect(body).toContain('viewBox="0 0 512 512"');
+  });
+
+  test("returns the stored SVG favicon without using the avatar route", async () => {
+    const response = await handleRequest(new Request("https://example.test/favicon.svg"));
+    const body = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("image/svg+xml; charset=utf-8");
+    expect(response.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
+    expect(response.headers.get("access-control-allow-origin")).toBe("*");
+    expect(body).toBe(FAVICON_SVG);
+    expect(body).toContain("Ashatar mountains avatar");
+    expect(body).toContain("Stealth deterministic SVG avatar");
   });
 
   test("returns byte-stable avatar bodies across repeated route requests", async () => {
