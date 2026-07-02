@@ -22,4 +22,5 @@ export function getAvatarGenerator(type: string): AvatarGenerator | undefined {
   return AVATAR_GENERATORS[type as AvatarType];
 }
 
+export { CIRCLES_TYPE, generateCircles } from "./circles";
 export { generateDots } from "./dots";

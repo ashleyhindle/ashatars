@@ -10,6 +10,7 @@ import {
   SUPPORTED_AVATAR_TYPES,
   VIBES,
 } from "../../src/avatar";
+import { generateCircles } from "../../src/avatar/types/circles";
 import { generateDots } from "../../src/avatar/types/dots";
 
 describe("deterministic avatar core", () => {
@@ -144,5 +145,63 @@ describe("dots avatar exemplar", () => {
     );
     expect(JSON.stringify(structured)).not.toContain(VIBES.ocean.palette.primary);
     expect(svg).not.toContain("Math.random");
+  });
+});
+
+describe("circles avatar generator", () => {
+  test("returns deterministic structured bubble layers inside the viewBox", () => {
+    const first = generateCircles(
+      createAvatarContext({
+        seed: "ashley@fuel.build",
+        type: "circles",
+        vibe: "bubble",
+      }),
+    );
+    const second = generateCircles(
+      createAvatarContext({
+        seed: "ashley@fuel.build",
+        type: "circles",
+        vibe: "bubble",
+      }),
+    );
+
+    expect(first).toEqual(second);
+    expect(first.layers.map((layer) => layer.id)).toEqual([
+      "circles-soft",
+      "circles-rings",
+      "circles-accents",
+    ]);
+
+    const shapes = first.layers.flatMap((layer) => layer.shapes);
+    expect(shapes.length).toBeGreaterThanOrEqual(14);
+    expect(shapes.length).toBeLessThanOrEqual(26);
+    expect(shapes.every((shape) => shape.kind === "circle")).toBe(true);
+
+    for (const shape of shapes) {
+      expect(shape.kind).toBe("circle");
+      if (shape.kind === "circle") {
+        expect(shape.cx - shape.r).toBeGreaterThanOrEqual(0);
+        expect(shape.cy - shape.r).toBeGreaterThanOrEqual(0);
+        expect(shape.cx + shape.r).toBeLessThanOrEqual(512);
+        expect(shape.cy + shape.r).toBeLessThanOrEqual(512);
+      }
+    }
+  });
+
+  test("renders valid SVG using vibe palette roles outside the generator", () => {
+    const ctx = createAvatarContext({
+      seed: "7db79f08-6b58-434d-a58d-3309b9eb0975",
+      type: "circles",
+      vibe: "ocean",
+    });
+    const artwork = generateCircles(ctx);
+    const svg = renderAvatarSvg(ctx, VIBES.ocean, artwork);
+
+    expect(svg).toContain('viewBox="0 0 512 512"');
+    expect(svg).toContain('id="circles-soft"');
+    expect(svg).toContain('fill="none"');
+    expect(svg).toContain(VIBES.ocean.palette.primary);
+    expect(JSON.stringify(artwork)).not.toContain(VIBES.ocean.palette.primary);
+    expect(JSON.stringify(artwork)).not.toContain("#");
   });
 });
