@@ -156,6 +156,46 @@ describe("deterministic avatar core", () => {
       expect(SUPPORTED_AVATAR_TYPES as readonly string[]).toContain(defaultType.value.type);
     }
   });
+
+  test("uses vibe for the background while keeping mark color stable by contrast", () => {
+    const daybreak = createAvatarSvg({
+      seed: "ashley@fuel.build",
+      type: "lines",
+      vibe: "daybreak",
+    });
+    const ocean = createAvatarSvg({
+      seed: "ashley@fuel.build",
+      type: "lines",
+      vibe: "ocean",
+    });
+    const stealth = createAvatarSvg({
+      seed: "ashley@fuel.build",
+      type: "lines",
+      vibe: "stealth",
+    });
+
+    expect(daybreak.ok).toBe(true);
+    expect(ocean.ok).toBe(true);
+    expect(stealth.ok).toBe(true);
+    if (daybreak.ok && ocean.ok && stealth.ok) {
+      expect(backgroundColors(daybreak.value.svg)).toEqual([
+        VIBES.daybreak.background.from,
+        VIBES.daybreak.background.to,
+      ]);
+      expect(backgroundColors(ocean.value.svg)).toEqual([
+        VIBES.ocean.background.from,
+        VIBES.ocean.background.to,
+      ]);
+      expect(backgroundColors(stealth.value.svg)).toEqual([
+        VIBES.stealth.background.from,
+        VIBES.stealth.background.to,
+      ]);
+      expect(backgroundColors(daybreak.value.svg)).not.toEqual(backgroundColors(ocean.value.svg));
+      expect(markColors(daybreak.value.svg)).toEqual([VIBES.daybreak.foreground]);
+      expect(markColors(ocean.value.svg)).toEqual([VIBES.daybreak.foreground]);
+      expect(markColors(stealth.value.svg)).toEqual([VIBES.stealth.foreground]);
+    }
+  });
 });
 
 describe("dots avatar exemplar", () => {
@@ -191,7 +231,7 @@ describe("dots avatar exemplar", () => {
     if (first.ok && second.ok) {
       expect(first.value.svg).toBe(second.value.svg);
       expect(hashHex(["snapshot", first.value.svg])).toBe(
-        "5127962c791364cc8430b5218ecdce93",
+        "d8f6707ac5abbec2a6a9df6ccae9bcfa",
       );
     }
   });
@@ -219,6 +259,18 @@ describe("dots avatar exemplar", () => {
     expect(svg).not.toContain("Math.random");
   });
 });
+
+function backgroundColors(svg: string): string[] {
+  return [...svg.matchAll(/stop-color="(#[0-9a-f]{6})"/g)].map((match) => match[1]!);
+}
+
+function markColors(svg: string): string[] {
+  return [
+    ...new Set(
+      [...svg.matchAll(/(?:fill|stroke)="(#[0-9a-f]{6})"/g)].map((match) => match[1]!),
+    ),
+  ];
+}
 
 describe("circles avatar generator", () => {
   test("returns deterministic structured bubble layers inside the viewBox", () => {

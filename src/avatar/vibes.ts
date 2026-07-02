@@ -12,117 +12,86 @@ export interface Vibe {
     readonly to: string;
     readonly angle: number;
   };
+  readonly foreground: string;
   readonly palette: Record<PaletteRole, string>;
+}
+
+const LIGHT_MARK = "#18181b";
+const DARK_MARK = "#f8fafc";
+
+function markPalette(color: string): Record<PaletteRole, string> {
+  return {
+    primary: color,
+    secondary: color,
+    accent: color,
+    soft: color,
+    contrast: color,
+  };
 }
 
 export const VIBES = {
   daybreak: {
     id: "daybreak",
     label: "Daybreak",
-    background: { from: "#fff7df", to: "#ffd1a1", angle: 135 },
-    palette: {
-      primary: "#c2410c",
-      secondary: "#f97316",
-      accent: "#0f766e",
-      soft: "#fed7aa",
-      contrast: "#1f2937",
-    },
+    background: { from: "#fff7df", to: "#ffd8a8", angle: 135 },
+    foreground: LIGHT_MARK,
+    palette: markPalette(LIGHT_MARK),
   },
   sunset: {
     id: "sunset",
     label: "Sunset",
-    background: { from: "#39113f", to: "#f97316", angle: 145 },
-    palette: {
-      primary: "#facc15",
-      secondary: "#fb7185",
-      accent: "#60a5fa",
-      soft: "#fdba74",
-      contrast: "#fff7ed",
-    },
+    background: { from: "#ffe4e6", to: "#ffc7a5", angle: 145 },
+    foreground: LIGHT_MARK,
+    palette: markPalette(LIGHT_MARK),
   },
   ocean: {
     id: "ocean",
     label: "Ocean",
-    background: { from: "#042f2e", to: "#38bdf8", angle: 120 },
-    palette: {
-      primary: "#e0f2fe",
-      secondary: "#2dd4bf",
-      accent: "#facc15",
-      soft: "#bae6fd",
-      contrast: "#082f49",
-    },
+    background: { from: "#dff7ff", to: "#a8dcf4", angle: 120 },
+    foreground: LIGHT_MARK,
+    palette: markPalette(LIGHT_MARK),
   },
   forest: {
     id: "forest",
     label: "Forest",
-    background: { from: "#052e16", to: "#86efac", angle: 125 },
-    palette: {
-      primary: "#fef3c7",
-      secondary: "#22c55e",
-      accent: "#a16207",
-      soft: "#bbf7d0",
-      contrast: "#14532d",
-    },
+    background: { from: "#e9f8df", to: "#bdecc9", angle: 125 },
+    foreground: LIGHT_MARK,
+    palette: markPalette(LIGHT_MARK),
   },
   fire: {
     id: "fire",
     label: "Fire",
-    background: { from: "#450a0a", to: "#f59e0b", angle: 140 },
-    palette: {
-      primary: "#fff7ed",
-      secondary: "#ef4444",
-      accent: "#fde047",
-      soft: "#fed7aa",
-      contrast: "#1c1917",
-    },
+    background: { from: "#ffe8cc", to: "#ffc2a0", angle: 140 },
+    foreground: LIGHT_MARK,
+    palette: markPalette(LIGHT_MARK),
   },
   crystal: {
     id: "crystal",
     label: "Crystal",
-    background: { from: "#f8fafc", to: "#a78bfa", angle: 130 },
-    palette: {
-      primary: "#312e81",
-      secondary: "#06b6d4",
-      accent: "#f0abfc",
-      soft: "#ddd6fe",
-      contrast: "#020617",
-    },
+    background: { from: "#f4efff", to: "#d9c8ff", angle: 130 },
+    foreground: LIGHT_MARK,
+    palette: markPalette(LIGHT_MARK),
   },
   ice: {
     id: "ice",
     label: "Ice",
-    background: { from: "#ecfeff", to: "#93c5fd", angle: 135 },
-    palette: {
-      primary: "#0f172a",
-      secondary: "#0284c7",
-      accent: "#67e8f9",
-      soft: "#dbeafe",
-      contrast: "#164e63",
-    },
+    background: { from: "#eefcff", to: "#cbeafe", angle: 135 },
+    foreground: LIGHT_MARK,
+    palette: markPalette(LIGHT_MARK),
   },
   stealth: {
     id: "stealth",
     label: "Stealth",
     background: { from: "#030712", to: "#374151", angle: 125 },
-    palette: {
-      primary: "#e5e7eb",
-      secondary: "#9ca3af",
-      accent: "#22c55e",
-      soft: "#4b5563",
-      contrast: "#f9fafb",
-    },
+    foreground: DARK_MARK,
+    palette: markPalette(DARK_MARK),
   },
   bubble: {
     id: "bubble",
     label: "Bubble",
-    background: { from: "#fdf2f8", to: "#bfdbfe", angle: 135 },
-    palette: {
-      primary: "#be185d",
-      secondary: "#7dd3fc",
-      accent: "#a78bfa",
-      soft: "#fbcfe8",
-      contrast: "#1e1b4b",
-    },
+    background: { from: "#fdf2f8", to: "#d8e7ff", angle: 135 },
+    foreground: LIGHT_MARK,
+    palette: markPalette(LIGHT_MARK),
   },
 } as const satisfies Record<string, Vibe>;
 

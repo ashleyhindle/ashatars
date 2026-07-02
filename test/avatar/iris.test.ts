@@ -47,7 +47,7 @@ describe("iris avatar generator", () => {
     expect(first).toContain('id="iris-petals"');
     expect(first).toContain('id="iris-aperture"');
     expect(first.length).toBeGreaterThan(3200);
-    expect(hashHex(["iris-snapshot", first])).toBe("aaf11c4d92582040c753445678a6a879");
+    expect(hashHex(["iris-snapshot", first])).toBe("340bb1b5d8463b50baaaafebee35c6f6");
   });
 
   test("keeps vibe colors outside generated structure and varies by input", () => {

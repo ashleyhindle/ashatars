@@ -48,7 +48,7 @@ describe("concentric arcs avatar generator", () => {
     expect(firstSvg).toContain("<path");
     expect(firstSvg).toContain(" A");
     expect(hashHex(["concentric-arcs", firstSvg])).toBe(
-      "b2f4bd38417aa6c0d63ea8b140c876fc",
+      "4d3248ddf8c7d1dba9adac9870aaf580",
     );
   });
 

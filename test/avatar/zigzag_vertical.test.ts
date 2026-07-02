@@ -74,7 +74,7 @@ describe("zigzag_vertical avatar generator", () => {
     expect(firstArtwork).toEqual(secondArtwork);
     expect(firstSvg).toBe(secondSvg);
     expect(hashHex(["zigzag_vertical", firstSvg])).toBe(
-      "5ccbf8d3df2d4daa0bd28a69bb55ee84",
+      "91a268805145b23631d94cc783b71762",
     );
     expect(JSON.stringify(firstArtwork)).not.toContain(VIBES.forest.palette.primary);
     expect(firstSvg).toContain(VIBES.forest.palette.primary);

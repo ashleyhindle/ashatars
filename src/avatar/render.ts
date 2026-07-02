@@ -121,7 +121,7 @@ function paintValue(paint: Paint, vibe: Vibe): string {
     return "none";
   }
 
-  return escapeAttribute(vibe.palette[paint.role]);
+  return escapeAttribute(vibe.foreground);
 }
 
 function validateArtwork(artwork: AvatarArtwork): void {

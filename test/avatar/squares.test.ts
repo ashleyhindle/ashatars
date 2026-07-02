@@ -38,7 +38,7 @@ describe("squares avatar generator", () => {
     expect(svg).toContain("<path");
     expect(svg).toContain('fill="none"');
     expect(svg).toContain('stroke-width="');
-    expect(hashHex(["snapshot", svg])).toBe("3a0ffa2bf42a7c89c854a82e36366cdd");
+    expect(hashHex(["snapshot", svg])).toBe("6016bf8848b8ad6bc70df2c7bf53e58a");
   });
 
   test("keeps vibe colors out of the generator output and varies by seed and vibe", () => {

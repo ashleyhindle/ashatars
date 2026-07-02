@@ -34,7 +34,7 @@ describe("grid avatar generator", () => {
     const second = renderGrid("ashley@fuel.build", "daybreak");
 
     expect(first).toBe(second);
-    expect(hashHex(["grid-snapshot", first])).toBe("2d698cc444500461de5a08ad1e939660");
+    expect(hashHex(["grid-snapshot", first])).toBe("8a1d004a618458086d6f382074edce83");
   });
 
   test("renders valid non-empty 512 viewBox geometry without vibe colors in the generator", () => {
