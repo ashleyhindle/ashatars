@@ -16,8 +16,12 @@ Bun-managed TypeScript Cloudflare Worker for deterministic SVG avatars.
 Examples:
 
 - `/ashley@fuel.build.svg?type=dots&vibe=ocean`
-- `/7db79f08-6b58-434d-a58d-3309b9eb0975.svg?types=dots,dots&vibe=daybreak`
+- `/7db79f08-6b58-434d-a58d-3309b9eb0975.svg?types=dots,lines,wave&vibe=daybreak`
 
 `type=<name>` selects one generator. Repeated `type` values or comma-separated `types` choose one supported generator deterministically. Invalid `type` or `vibe` values return `400`.
+
+Supported types: `circles`, `lines`, `grid`, `diagonal_grid`, `squares`, `mountains`, `zigzag_vertical`, `wiggles`, `sunrise`, `clock`, `dots`, `concentric_arcs`, `iris`, `wave`, `blob_face`, and `carets`.
+
+Deferred types: none. Every type from `refs/svgs.ex` is implemented and advertised in the homepage gallery.
 
 Custom-domain deployment is intentionally left as a placeholder in `wrangler.jsonc`.

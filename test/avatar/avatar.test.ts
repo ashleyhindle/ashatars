@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   createAvatarContext,
   createAvatarSvg,
+  getAvatarGenerator,
   hashHex,
   normalizeSeed,
   resolveAvatarType,
@@ -12,6 +13,25 @@ import {
 } from "../../src/avatar";
 import { generateCircles } from "../../src/avatar/types/circles";
 import { generateDots } from "../../src/avatar/types/dots";
+
+const IMPLEMENTED_TYPES = [
+  "circles",
+  "lines",
+  "grid",
+  "diagonal_grid",
+  "squares",
+  "mountains",
+  "zigzag_vertical",
+  "wiggles",
+  "sunrise",
+  "clock",
+  "dots",
+  "concentric_arcs",
+  "iris",
+  "wave",
+  "blob_face",
+  "carets",
+] as const;
 
 describe("deterministic avatar core", () => {
   test("normalizes email seeds with trim and lowercase", () => {
@@ -68,20 +88,72 @@ describe("deterministic avatar core", () => {
     const type = resolveAvatarType({
       seed: "ashley@fuel.build",
       supportedTypes: SUPPORTED_AVATAR_TYPES,
-      type: "clock",
+      type: "not-a-type",
     });
     const vibe = resolveVibe("nope");
 
     expect(type.ok).toBe(false);
     if (!type.ok) {
       expect(type.error.code).toBe("invalid_type");
-      expect(type.error.supported).toEqual(["dots"]);
+      expect(type.error.supported).toEqual([...IMPLEMENTED_TYPES]);
     }
 
     expect(vibe.ok).toBe(false);
     if (!vibe.ok) {
       expect(vibe.error.code).toBe("invalid_vibe");
       expect(vibe.error.supported).toContain("daybreak");
+    }
+  });
+
+  test("lists every implemented type once in the supported registry", () => {
+    expect(SUPPORTED_AVATAR_TYPES).toEqual([...IMPLEMENTED_TYPES]);
+    expect(new Set(SUPPORTED_AVATAR_TYPES).size).toBe(SUPPORTED_AVATAR_TYPES.length);
+
+    for (const type of SUPPORTED_AVATAR_TYPES) {
+      expect(getAvatarGenerator(type)?.type).toBe(type);
+    }
+  });
+
+  test("renders every supported type through the public avatar factory", () => {
+    for (const type of SUPPORTED_AVATAR_TYPES) {
+      const avatar = createAvatarSvg({
+        seed: "ashley@fuel.build",
+        type,
+        vibe: "daybreak",
+      });
+
+      expect(avatar.ok).toBe(true);
+      if (avatar.ok) {
+        expect(avatar.value.type).toBe(type);
+        expect(avatar.value.svg).toContain('viewBox="0 0 512 512"');
+      }
+    }
+  });
+
+  test("selects deterministic supported types for types= and no explicit type", () => {
+    const supported = SUPPORTED_AVATAR_TYPES.join(",");
+    const fromTypes = createAvatarSvg({
+      seed: "ashley@fuel.build",
+      types: supported,
+      vibe: "ocean",
+    });
+    const fromTypesAgain = createAvatarSvg({
+      seed: "ashley@fuel.build",
+      types: supported,
+      vibe: "ocean",
+    });
+    const defaultType = createAvatarSvg({
+      seed: "ashley@fuel.build",
+      vibe: "ocean",
+    });
+
+    expect(fromTypes.ok).toBe(true);
+    expect(fromTypesAgain.ok).toBe(true);
+    expect(defaultType.ok).toBe(true);
+    if (fromTypes.ok && fromTypesAgain.ok && defaultType.ok) {
+      expect(fromTypes.value.type).toBe(fromTypesAgain.value.type);
+      expect(SUPPORTED_AVATAR_TYPES as readonly string[]).toContain(fromTypes.value.type);
+      expect(SUPPORTED_AVATAR_TYPES as readonly string[]).toContain(defaultType.value.type);
     }
   });
 });

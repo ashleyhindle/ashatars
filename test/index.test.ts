@@ -55,7 +55,7 @@ describe("worker routes", () => {
 
   test("rejects invalid type and vibe params", async () => {
     const invalidType = await handleRequest(
-      new Request("https://example.test/ashley@fuel.build.svg?type=clock"),
+      new Request("https://example.test/ashley@fuel.build.svg?type=not-a-type"),
     );
     const invalidVibe = await handleRequest(
       new Request("https://example.test/ashley@fuel.build.svg?vibe=nope"),
