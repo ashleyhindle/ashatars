@@ -14,8 +14,9 @@ avatar endpoint.
 
 ## Routes
 
-- `/` returns the local docs/gallery homepage with generated examples for
-  `ashley@fuel.build`.
+- `/` returns the local docs/gallery homepage with circular generated examples
+  for `ashley@fuel.build`, a vibe selector, and a refresh button that swaps the
+  whole gallery to a random UUID seed.
 - `/:seed.svg` returns a deterministic SVG avatar.
 - `/avatar/:seed.svg` is intentionally absent and returns `404`.
 

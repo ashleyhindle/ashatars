@@ -12,6 +12,12 @@ describe("worker routes", () => {
     expect(body).toContain("<h1");
     expect(body).toContain("Ashatars");
     expect(body).toContain('id="vibe"');
+    expect(body).toContain('id="refresh-seed"');
+    expect(body).toContain('id="seed-value"');
+    expect(body).toContain('class="avatar-thumb"');
+    expect(body).toContain("border-radius: 50%");
+    expect(body).toContain("crypto.randomUUID");
+    expect(body).toContain("fallbackUuid");
     for (const type of SUPPORTED_AVATAR_TYPES) {
       expect(body).toContain(`data-avatar-type="${type}"`);
       expect(body).toContain(`/ashley%40fuel.build.svg?type=${type}&amp;vibe=daybreak`);
