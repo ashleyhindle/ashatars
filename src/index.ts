@@ -158,6 +158,8 @@ export function renderHomepage(origin = "https://example.test"): string {
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="description" content="${escapeAttribute(HOMEPAGE_SOCIAL_DESCRIPTION)}"/>
     <meta property="og:title" content="${escapeAttribute(HOMEPAGE_SOCIAL_TITLE)}"/>
+  <script defer src="https://cdn.jsdelivr.net/npm/ogkit@1"></script>
+
     <meta property="og:description" content="${escapeAttribute(HOMEPAGE_SOCIAL_DESCRIPTION)}"/>
     <meta property="og:type" content="website"/>
     <meta property="og:url" content="${escapeAttribute(CANONICAL_HOMEPAGE_URL)}"/>
@@ -714,7 +716,7 @@ function renderOgTemplate(): string {
   ] as const;
   const previewAvatars = previewSeeds
     .map(({ seed, type }) => {
-      const src = avatarUrl(CANONICAL_HOMEPAGE_URL.slice(0, -1), seed, { type, vibe: "stealth" });
+      const src = avatarUrl(CANONICAL_HOMEPAGE_URL.slice(0, -5), seed, { type, vibe: "stealth" });
 
       return [
         `<div style="width:132px;height:132px;border-radius:999px;padding:2px;background:linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.08));box-shadow:0 22px 48px rgba(0,0,0,.38);">`,
@@ -726,7 +728,7 @@ function renderOgTemplate(): string {
 
   return [
     `<template data-og-template>`,
-    `<div style="position:relative;width:1200px;height:630px;display:flex;align-items:stretch;background:#090b10;color:#f7f8fb;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;">`,
+    `<div style="padding-bottom:3rem;position:relative;width:1200px;height:630px;display:flex;align-items:stretch;background:#090b10;color:#f7f8fb;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;">`,
     `<div style="position:absolute;width:1200px;height:630px;background:radial-gradient(circle at 18% 18%,rgba(125,211,252,.18),transparent 28%),radial-gradient(circle at 82% 22%,rgba(45,212,191,.16),transparent 30%),linear-gradient(135deg,#090b10 0%,#11151d 48%,#05070a 100%);"></div>`,
     `<div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(90deg,rgba(0,0,0,.78),rgba(0,0,0,.2));"></div>`,
     `<div style="position:relative;display:flex;flex-direction:column;justify-content:space-between;width:100%;padding:74px 82px 70px;">`,
@@ -738,7 +740,7 @@ function renderOgTemplate(): string {
     `<div style="width:670px;">`,
     `<h1 style="margin:0 0 24px;font-size:108px;line-height:.92;font-weight:900;letter-spacing:0;color:#ffffff;">Fuel Avatars</h1>`,
     `<p style="margin:0 0 34px;color:#dbeafe;font-size:38px;line-height:1.16;font-weight:650;">Deterministic SVG avatars for emails and UUIDs, generated at the edge.</p>`,
-    `<div style="display:inline-flex;max-width:660px;border:1px solid rgba(255,255,255,.22);border-radius:18px;background:rgba(8,12,20,.72);padding:18px 22px;color:#a7f3d0;font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace;font-size:25px;line-height:1.28;box-shadow:0 18px 50px rgba(0,0,0,.28);">/ashley@fuel.build.svg?type=dots&amp;vibe=stealth</div>`,
+    `<div style="display:inline-flex;max-width:660px;border:1px solid rgba(255,255,255,.22);border-radius:18px;background:rgba(8,12,20,.72);padding:18px 22px;color:#a7f3d0;font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace;font-size:25px;line-height:1.28;box-shadow:0 18px 50px rgba(0,0,0,.28);">/username.svg?type=dots&amp;vibe=stealth</div>`,
     `</div>`,
     `<div style="display:grid;grid-template-columns:repeat(2,132px);gap:24px;transform:rotate(-3deg);">${previewAvatars}</div>`,
     `</div>`,
