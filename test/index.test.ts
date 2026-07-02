@@ -46,6 +46,32 @@ describe("worker routes", () => {
     }
   });
 
+  test("renders complete social metadata and an OG Kit template", async () => {
+    const response = await handleRequest(new Request("https://example.test/"));
+    const body = await response.text();
+    const canonicalUrl = "https://avatars.fuel.build/";
+    const description = "Deterministic SVG avatars for emails and UUIDs, generated at the edge.";
+    const ogImageUrl = "https://ogkit.dev/img/I5SRd8yM.jpeg?url=https%3A%2F%2Favatars.fuel.build%2F";
+
+    expect(body).toContain(`<meta name="description" content="${description}"/>`);
+    expect(body).toContain('<meta property="og:title" content="Ashatars"/>');
+    expect(body).toContain(`<meta property="og:description" content="${description}"/>`);
+    expect(body).toContain('<meta property="og:type" content="website"/>');
+    expect(body).toContain(`<meta property="og:url" content="${canonicalUrl}"/>`);
+    expect(body).toContain(`<meta property="og:image" content="${ogImageUrl}"/>`);
+    expect(body).toContain('<meta name="twitter:card" content="summary_large_image"/>');
+    expect(body).toContain('<meta name="twitter:title" content="Ashatars"/>');
+    expect(body).toContain(`<meta name="twitter:description" content="${description}"/>`);
+    expect(body).toContain(`<meta name="twitter:image" content="${ogImageUrl}"/>`);
+    expect(body).toContain("<template data-og-template>");
+    expect(body).toContain("width:1200px;height:630px");
+    expect(body).toContain("Ashatars");
+    expect(body).toContain("/ashley@fuel.build.svg?type=dots&amp;vibe=stealth");
+    expect(body).toContain("https://avatars.fuel.build/ashley%40fuel.build.svg?type=dots&amp;vibe=stealth");
+    expect(body).toContain("https://avatars.fuel.build/design%40fuel.build.svg?type=iris&amp;vibe=stealth");
+    expect(body).not.toContain("https://example.test/ashley%40fuel.build.svg?type=dots&amp;vibe=stealth</template>");
+  });
+
   test("builds avatar paths with single type and deterministic type-list semantics", () => {
     expect(avatarPath("ashley@fuel.build", { type: "dots", vibe: "ocean" })).toBe(
       "/ashley%40fuel.build.svg?type=dots&vibe=ocean",

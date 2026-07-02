@@ -9,6 +9,11 @@ import { FAVICON_SVG } from "./favicon";
 
 export interface Env {}
 
+const CANONICAL_HOMEPAGE_URL = "https://avatars.fuel.build/";
+const HOMEPAGE_SOCIAL_TITLE = "Ashatars";
+const HOMEPAGE_SOCIAL_DESCRIPTION = "Deterministic SVG avatars for emails and UUIDs, generated at the edge.";
+const OG_KIT_IMAGE_URL = `https://ogkit.dev/img/I5SRd8yM.jpeg?url=${encodeURIComponent(CANONICAL_HOMEPAGE_URL)}`;
+
 const SVG_HEADERS = {
   "content-type": "image/svg+xml; charset=utf-8",
   "cache-control": "public, max-age=31536000, immutable",
@@ -144,12 +149,23 @@ export function renderHomepage(origin = "https://example.test"): string {
   const builderUrl = avatarUrl(origin, seed, {
     vibe: DEFAULT_VIBE,
   });
+  const socialTemplate = renderOgTemplate();
 
   return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content="${escapeAttribute(HOMEPAGE_SOCIAL_DESCRIPTION)}"/>
+    <meta property="og:title" content="${escapeAttribute(HOMEPAGE_SOCIAL_TITLE)}"/>
+    <meta property="og:description" content="${escapeAttribute(HOMEPAGE_SOCIAL_DESCRIPTION)}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="${escapeAttribute(CANONICAL_HOMEPAGE_URL)}"/>
+    <meta property="og:image" content="${escapeAttribute(OG_KIT_IMAGE_URL)}"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="${escapeAttribute(HOMEPAGE_SOCIAL_TITLE)}"/>
+    <meta name="twitter:description" content="${escapeAttribute(HOMEPAGE_SOCIAL_DESCRIPTION)}"/>
+    <meta name="twitter:image" content="${escapeAttribute(OG_KIT_IMAGE_URL)}"/>
     <title>Line Avatars</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
@@ -522,6 +538,7 @@ export function renderHomepage(origin = "https://example.test"): string {
     </style>
   </head>
   <body>
+    ${socialTemplate}
     <main>
       <section class="masthead" aria-labelledby="title">
         <div>
@@ -686,6 +703,49 @@ export function renderHomepage(origin = "https://example.test"): string {
     </script>
   </body>
 </html>`;
+}
+
+function renderOgTemplate(): string {
+  const previewSeeds = [
+    { seed: "ashley@fuel.build", type: "dots" },
+    { seed: "design@fuel.build", type: "iris" },
+    { seed: "edge@fuel.build", type: "mountains" },
+    { seed: "builder@fuel.build", type: "wave" },
+  ] as const;
+  const previewAvatars = previewSeeds
+    .map(({ seed, type }) => {
+      const src = avatarUrl(CANONICAL_HOMEPAGE_URL.slice(0, -1), seed, { type, vibe: "stealth" });
+
+      return [
+        `<div style="width:132px;height:132px;border-radius:999px;padding:2px;background:linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.08));box-shadow:0 22px 48px rgba(0,0,0,.38);">`,
+        `<img src="${escapeAttribute(src)}" alt="" width="128" height="128" style="display:block;width:128px;height:128px;border-radius:999px;object-fit:cover;background:#101318;"/>`,
+        `</div>`,
+      ].join("");
+    })
+    .join("");
+
+  return [
+    `<template data-og-template>`,
+    `<div style="position:relative;width:1200px;height:630px;display:flex;align-items:stretch;background:#090b10;color:#f7f8fb;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;">`,
+    `<div style="position:absolute;width:1200px;height:630px;background:radial-gradient(circle at 18% 18%,rgba(125,211,252,.18),transparent 28%),radial-gradient(circle at 82% 22%,rgba(45,212,191,.16),transparent 30%),linear-gradient(135deg,#090b10 0%,#11151d 48%,#05070a 100%);"></div>`,
+    `<div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(90deg,rgba(0,0,0,.78),rgba(0,0,0,.2));"></div>`,
+    `<div style="position:relative;display:flex;flex-direction:column;justify-content:space-between;width:100%;padding:74px 82px 70px;">`,
+    `<div style="display:flex;align-items:center;gap:18px;color:#cbd5e1;font-size:28px;font-weight:750;letter-spacing:0;">`,
+    `<div style="width:54px;height:54px;border-radius:16px;background:#f8fafc;display:flex;align-items:center;justify-content:center;color:#0b0f16;font-size:30px;font-weight:900;">A</div>`,
+    `<span>avatars.fuel.build</span>`,
+    `</div>`,
+    `<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:60px;">`,
+    `<div style="width:670px;">`,
+    `<h1 style="margin:0 0 24px;font-size:108px;line-height:.92;font-weight:900;letter-spacing:0;color:#ffffff;">Ashatars</h1>`,
+    `<p style="margin:0 0 34px;color:#dbeafe;font-size:38px;line-height:1.16;font-weight:650;">Deterministic SVG avatars for emails and UUIDs, generated at the edge.</p>`,
+    `<div style="display:inline-flex;max-width:660px;border:1px solid rgba(255,255,255,.22);border-radius:18px;background:rgba(8,12,20,.72);padding:18px 22px;color:#a7f3d0;font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace;font-size:25px;line-height:1.28;box-shadow:0 18px 50px rgba(0,0,0,.28);">/ashley@fuel.build.svg?type=dots&amp;vibe=stealth</div>`,
+    `</div>`,
+    `<div style="display:grid;grid-template-columns:repeat(2,132px);gap:24px;transform:rotate(-3deg);">${previewAvatars}</div>`,
+    `</div>`,
+    `</div>`,
+    `</div>`,
+    `</template>`,
+  ].join("");
 }
 
 export function avatarPath(
