@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "deploy": "bun test && bun run typecheck && wrangler deploy"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20260702.1",
