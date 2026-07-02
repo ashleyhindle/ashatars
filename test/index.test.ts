@@ -53,9 +53,23 @@ describe("worker routes", () => {
     expect(first).toBe(second);
   });
 
+  test("supports documented type-list selection forms deterministically", async () => {
+    const commaUrl = "https://example.test/ashley@fuel.build.svg?types=dots,lines,wave&vibe=ocean";
+    const repeatedUrl = "https://example.test/ashley@fuel.build.svg?type=dots&type=lines&type=wave&vibe=ocean";
+    const commaFirst = await handleRequest(new Request(commaUrl)).text();
+    const commaSecond = await handleRequest(new Request(commaUrl)).text();
+    const repeated = await handleRequest(new Request(repeatedUrl)).text();
+
+    expect(commaFirst).toBe(commaSecond);
+    expect(repeated).toStartWith('<svg xmlns="http://www.w3.org/2000/svg"');
+  });
+
   test("rejects invalid type and vibe params", async () => {
     const invalidType = await handleRequest(
       new Request("https://example.test/ashley@fuel.build.svg?type=not-a-type"),
+    );
+    const invalidTypes = await handleRequest(
+      new Request("https://example.test/ashley@fuel.build.svg?types=dots,not-a-type"),
     );
     const invalidVibe = await handleRequest(
       new Request("https://example.test/ashley@fuel.build.svg?vibe=nope"),
@@ -63,6 +77,8 @@ describe("worker routes", () => {
 
     expect(invalidType.status).toBe(400);
     expect(await invalidType.text()).toContain("Unsupported avatar type");
+    expect(invalidTypes.status).toBe(400);
+    expect(await invalidTypes.text()).toContain("Unsupported avatar type");
     expect(invalidVibe.status).toBe(400);
     expect(await invalidVibe.text()).toContain("Unsupported avatar vibe");
   });
@@ -71,5 +87,21 @@ describe("worker routes", () => {
     const response = await handleRequest(new Request("https://example.test/avatar/demo.svg"));
 
     expect(response.status).toBe(404);
+  });
+
+  test("README avatar examples match implemented routes", async () => {
+    const readme = await Bun.file("README.md").text();
+    const examples = [
+      "/ashley@fuel.build.svg?type=dots&vibe=ocean",
+      "/7db79f08-6b58-434d-a58d-3309b9eb0975.svg?types=dots,lines,wave&vibe=daybreak",
+    ];
+
+    for (const path of examples) {
+      expect(readme).toContain(path);
+      const response = await handleRequest(new Request(`https://example.test${path}`));
+
+      expect(response.status).toBe(200);
+      expect(response.headers.get("content-type")).toBe("image/svg+xml; charset=utf-8");
+    }
   });
 });
